@@ -30,7 +30,7 @@
   },
   "engines": {
     "homebridge": "^1.6.0",
-    "node": "^18.20.0 || ^20.12.0"
+    "node": "^18.20.4 || ^20.15.1"
   },
   "repository": {
     "type": "git",
@@ -58,8 +58,8 @@
     }
   ],
   "dependencies": {
-    "@homebridge/plugin-ui-utils": "^1.0.2",
-    "ecovacs-deebot": "^0.9.6-beta.5"
+    "@homebridge/plugin-ui-utils": "^1.0.3",
+    "ecovacs-deebot": "^0.9.6-beta.6"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
