@@ -16,6 +16,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Updated dependencies
 - Bump `node` recommended versions to v18.20.4 or v20.15.1
 - Amend Homebridge support in `package.json`
+- Updated `eslint` and use new code style
 
 ## 6.1.1 (2023-08-28)
 

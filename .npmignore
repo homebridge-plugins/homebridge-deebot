@@ -1,5 +1,5 @@
 .github
-.eslintrc.cjs
+eslint.config.js
 .idea
 .nova
 .npm

@@ -1,44 +1,14 @@
 {
   "name": "homebridge-deebot",
   "alias": "Deebot",
+  "type": "module",
   "version": "6.1.2-beta.6",
+  "description": "Homebridge plugin to integrate ECOVACS Deebot devices into HomeKit.",
   "author": {
     "name": "bwp91",
     "email": "bwp91@icloud.com"
   },
-  "type": "module",
-  "main": "lib/index.js",
-  "description": "Homebridge plugin to integrate ECOVACS Deebot devices into HomeKit.",
   "license": "MIT",
-  "keywords": [
-    "homebridge",
-    "homebridge-plugin",
-    "homebridge-deebot",
-    "hoobs",
-    "hoobs-plugin",
-    "homekit",
-    "siri",
-    "ecovacs",
-    "deebot",
-    "yeedi",
-    "vacuum",
-    "hoover"
-  ],
-  "scripts": {
-    "lint": "eslint . --fix",
-    "rebuild": "rm -rf package-lock.json && rm -rf node_modules && npm install"
-  },
-  "engines": {
-    "homebridge": "^1.6.0 || ^2.0.0-alpha.0",
-    "node": "^18.20.4 || ^20.15.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bwp91/homebridge-deebot.git"
-  },
-  "bugs": {
-    "url": "https://github.com/bwp91/homebridge-deebot/issues"
-  },
   "funding": [
     {
       "type": "github",
@@ -57,15 +27,42 @@
       "url": "https://www.paypal.me/BenPotter"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bwp91/homebridge-deebot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bwp91/homebridge-deebot/issues"
+  },
+  "keywords": [
+    "homebridge",
+    "homebridge-plugin",
+    "homebridge-deebot",
+    "hoobs",
+    "hoobs-plugin",
+    "homekit",
+    "siri",
+    "ecovacs",
+    "deebot",
+    "yeedi",
+    "vacuum",
+    "hoover"
+  ],
+  "main": "lib/index.js",
+  "engines": {
+    "homebridge": "^1.6.0 || ^2.0.0-alpha.0",
+    "node": "^18.20.4 || ^20.15.1"
+  },
+  "scripts": {
+    "lint": "eslint . --fix",
+    "rebuild": "rm -rf package-lock.json && rm -rf node_modules && npm install"
+  },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^1.0.3",
     "ecovacs-deebot": "^0.9.6-beta.6"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-import-newlines": "^1.4.0",
-    "eslint-plugin-sort-exports": "^0.9.1"
+    "@antfu/eslint-config": "~2.21.3",
+    "eslint": "^9.7.0"
   }
 }
