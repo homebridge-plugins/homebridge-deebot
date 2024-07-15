@@ -1,4 +1,3 @@
-/* eslint perfectionist/sort-objects: "error" */
 import { antfu } from '@antfu/eslint-config'
 
 /** @type {typeof antfu} */
