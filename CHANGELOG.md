@@ -14,9 +14,10 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 
 - Fixed for `hap-nodejs` v1.0.0
 - Updated dependencies
-- Bump `node` recommended versions to v18.20.4 or v20.15.1
+- Bump `node` recommended versions to v18.20.4 or v20.16.0 or v22.5.0
 - Amend Homebridge support in `package.json`
 - Updated `eslint` and use new code style
+- Allow node 22
 
 ## 6.1.1 (2023-08-28)
 
