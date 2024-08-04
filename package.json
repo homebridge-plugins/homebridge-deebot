@@ -2,7 +2,7 @@
   "name": "homebridge-deebot",
   "alias": "Deebot",
   "type": "module",
-  "version": "6.1.2-beta.7",
+  "version": "6.1.2-beta.8",
   "description": "Homebridge plugin to integrate ECOVACS Deebot devices into HomeKit.",
   "author": {
     "name": "bwp91",
