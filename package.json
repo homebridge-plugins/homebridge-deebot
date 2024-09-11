@@ -62,7 +62,7 @@
     "ecovacs-deebot": "^0.9.6-beta.6"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.24.1",
+    "@antfu/eslint-config": "^3.5.1",
     "eslint": "^9.8.0"
   }
 }
