@@ -4,7 +4,7 @@
   "singular": true,
   "customUi": true,
   "customUiPath": "./lib/homebridge-ui",
-  "headerDisplay": "<p align=\"center\"><img width=\"60%\" src=\"https://user-images.githubusercontent.com/43026681/101321841-f0eb5280-385d-11eb-8dd4-f57113f6e078.png\"></p><p align=\"center\">For help and support please visit our <a href=\"https://github.com/bwp91/homebridge-deebot/wiki\">GitHub Wiki</a>. We hope you find this plugin useful!</p>",
+  "headerDisplay": "<p align=\"center\"><img width=\"60%\" src=\"https://user-images.githubusercontent.com/43026681/101321841-f0eb5280-385d-11eb-8dd4-f57113f6e078.png\"></p><p align=\"center\">For help and support please visit our <a href=\"https://github.com/homebridge-plugins/homebridge-deebot/wiki\">GitHub Wiki</a>. We hope you find this plugin useful!</p>",
   "schema": {
     "type": "object",
     "properties": {
@@ -20,7 +20,7 @@
       },
       "countryCode": {
         "title": "Country Code",
-        "description": "Two-letter country code which you can find <a href=\"https://github.com/bwp91/homebridge-deebot/wiki/Country-Codes\" target=\"_blank\">here</a>.",
+        "description": "Two-letter country code which you can find <a href=\"https://github.com/homebridge-plugins/homebridge-deebot/wiki/Country-Codes\" target=\"_blank\">here</a>.",
         "type": "string",
         "required": true
       },
@@ -730,7 +730,7 @@
               "condition": {
                 "functionBody": "return (model?.devices?.[arrayIndices]?.deviceId?.length > 0 && !model?.devices?.[arrayIndices]?.ignoreDevice);"
               },
-              "description": "Create Eve app buttons for cleaning predefined 'Spot Areas' or 'Custom Areas'. <a href=\"https://github.com/bwp91/homebridge-deebot/wiki/Predefined-Areas\" target=\"_blank\">Read more →</a>",
+              "description": "Create Eve app buttons for cleaning predefined 'Spot Areas' or 'Custom Areas'. <a href=\"https://github.com/homebridge-plugins/homebridge-deebot/wiki/Predefined-Areas\" target=\"_blank\">Read more →</a>",
               "items": [
                 {
                   "expandable": false,
