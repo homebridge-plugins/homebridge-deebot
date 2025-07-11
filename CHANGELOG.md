@@ -8,6 +8,12 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - `MINOR` version when a new device type is added, or when a new feature is added that is backwards-compatible
 - `PATCH` version when backwards-compatible bug fixes are implemented
 
+## v7.0.1 (2025-07-11)
+
+### Changed
+
+- patch `evocavs-deebot` with a change to not log events when not in debug mode
+
 ## v7.0.0 (2025-07-11)
 
 - Drop support for Node.js v16 and v18, add support for Node.js v20, v22, and v24
