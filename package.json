@@ -1,5 +1,6 @@
 {
-  "name": "homebridge-deebot",
+  "name": "@homebridge-plugins/homebridge-ecovacs",
+  "displayName": "Homebridge Ecovacs",
   "alias": "Deebot",
   "type": "module",
   "version": "7.0.0",
@@ -27,18 +28,19 @@
       "url": "https://www.paypal.me/BenPotter"
     }
   ],
-  "homepage": "https://github.com/homebridge-plugins/homebridge-deebot",
+  "homepage": "https://github.com/homebridge-plugins/homebridge-ecovacs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/homebridge-plugins/homebridge-deebot.git"
+    "url": "git+https://github.com/homebridge-plugins/homebridge-ecovacs.git"
   },
   "bugs": {
-    "url": "https://github.com/homebridge-plugins/homebridge-deebot/issues"
+    "url": "https://github.com/homebridge-plugins/homebridge-ecovacs/issues"
   },
   "keywords": [
     "homebridge",
     "homebridge-plugin",
     "homebridge-deebot",
+    "homebridge-ecovacs",
     "hoobs",
     "hoobs-plugin",
     "homekit",

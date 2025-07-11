@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to homebridge-deebot will be documented in this file.
+All notable changes to homebridge-ecovacs will be documented in this file.
 
 This project tries to adhere to [Semantic Versioning](http://semver.org/). In practice, this means that the version number will be incremented based on the following:
 
@@ -345,7 +345,7 @@ _Unpublished_
 
 ### Fixed
 
-- Attempt to fix an accessory duplication issue ([#37](https://github.com/homebridge-plugins/homebridge-deebot/issues/37))
+- Attempt to fix an accessory duplication issue ([#37](https://github.com/homebridge-plugins/homebridge-ecovacs/issues/37))
 
 ### Removed
 
@@ -438,7 +438,7 @@ _Unpublished_
 
 - ⚠️ The plugin now uses a **per-device** configuration
   - Current device-specific configurations will cease to work until you update your settings
-  - Refer to [the wiki](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Configuration) for details regarding the new configuration
+  - Refer to [the wiki](https://github.com/homebridge-plugins/homebridge-ecovacs/wiki/Configuration) for details regarding the new configuration
 - Use the new `.onSet` methods available in Homebridge v1.3
 - Modified config schema to show titles/descriptions for non Homebridge UI users
 - Update wiki links in the Homebridge plugin-ui
