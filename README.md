@@ -1,16 +1,18 @@
 <p align="center">
-   <a href="https://github.com/bwp91/homebridge-deebot"><img alt="homebridge-deebot" src="https://user-images.githubusercontent.com/43026681/101321841-f0eb5280-385d-11eb-8dd4-f57113f6e078.png" width="600px"></a>
+   <a href="https://github.com/homebridge-plugins/homebridge-deebot"><img alt="homebridge-deebot" src="https://user-images.githubusercontent.com/43026681/101321841-f0eb5280-385d-11eb-8dd4-f57113f6e078.png" width="600px"></a>
 </p>
 <span align="center">
-  
+
 # homebridge-deebot
 
 Homebridge plugin to integrate ECOVACS Deebot or Yeedi devices into HomeKit
 
 [![npm](https://img.shields.io/npm/v/homebridge-deebot/latest?label=latest)](https://www.npmjs.com/package/homebridge-deebot)
-[![npm](https://img.shields.io/npm/v/homebridge-deebot/beta?label=beta)](https://github.com/bwp91/homebridge-deebot/wiki/Beta-Version)  
+[![npm](https://img.shields.io/npm/v/homebridge-deebot/beta?label=beta)](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Beta-Version)
+
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
-[![hoobs-certified](https://badgen.net/badge/HOOBS/certified/yellow?label=hoobs)](https://plugins.hoobs.org/plugin/homebridge-deebot)  
+[![hoobs-certified](https://badgen.net/badge/HOOBS/certified/yellow?label=hoobs)](https://plugins.hoobs.org/plugin/homebridge-deebot)
+
 [![npm](https://img.shields.io/npm/dt/homebridge-deebot)](https://www.npmjs.com/package/homebridge-deebot)
 [![Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=hb-discord)](https://discord.com/channels/432663330281226270/742733745743855627)
 
@@ -25,27 +27,27 @@ Homebridge plugin to integrate ECOVACS Deebot or Yeedi devices into HomeKit
 ### Prerequisites
 
 - To use this plugin, you will need to already have:
-  - [Node](https://nodejs.org): latest version of `v16`, `v18` or `v20` - any other major version is not supported.
+  - [Node](https://nodejs.org): latest version of `v20`, `v22` or `v24` - any other major version is not supported.
   - [Homebridge](https://homebridge.io): `v1.6` - refer to link for more information and installation instructions.
 
 ### Setup
 
-- [Installation](https://github.com/bwp91/homebridge-deebot/wiki/Installation)
-- [Configuration](https://github.com/bwp91/homebridge-deebot/wiki/Configuration)
-- [Beta Version](https://github.com/bwp91/homebridge-deebot/wiki/Beta-Version)
-- [Node Version](https://github.com/bwp91/homebridge-deebot/wiki/Node-Version)
+- [Installation](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Installation)
+- [Configuration](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Configuration)
+- [Beta Version](https://github.com/homebridge/homebridge/wiki/How-to-Install-Alternate-Plugin-Versions)
+- [Node Version](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Node-Version)
 
 ### Features
 
-- [Supported Devices](https://github.com/bwp91/homebridge-deebot/wiki/Supported-Devices)
-- [Speed Control](https://github.com/bwp91/homebridge-deebot/wiki/Speed-Control)
-- [Predefined Areas](https://github.com/bwp91/homebridge-deebot/wiki/Predefined-Areas)
+- [Supported Devices](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Supported-Devices)
+- [Speed Control](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Speed-Control)
+- [Predefined Areas](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Predefined-Areas)
 
 ### Help/About
 
-- [Common Errors](https://github.com/bwp91/homebridge-deebot/wiki/Common-Errors)
-- [Support Request](https://github.com/bwp91/homebridge-deebot/issues/new/choose)
-- [Changelog](https://github.com/bwp91/homebridge-deebot/blob/latest/CHANGELOG.md)
+- [Common Errors](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Common-Errors)
+- [Support Request](https://github.com/homebridge-plugins/homebridge-deebot/issues/new/choose)
+- [Changelog](https://github.com/homebridge-plugins/homebridge-deebot/blob/latest/CHANGELOG.md)
 - [About Me](https://github.com/sponsors/bwp91)
 
 ### Credits

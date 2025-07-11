@@ -8,7 +8,11 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - `MINOR` version when a new device type is added, or when a new feature is added that is backwards-compatible
 - `PATCH` version when backwards-compatible bug fixes are implemented
 
-## 6.1.1 (2023-08-28)
+## v7.0.0 (2025-07-11)
+
+- Drop support for Node.js v16 and v18, add support for Node.js v20, v22, and v24
+
+## v6.1.1 (2023-08-28)
 
 ⚠️ Note this will be the last version of the plugin to support Node 16.
 - Node 16 moves to 'end of life' on 2023-09-11 ([more info](https://nodejs.org/en/blog/announcements/nodejs16-eol))
@@ -19,7 +23,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 
 - Updated dependencies
 
-## 6.1.0 (2023-08-10)
+## v6.1.0 (2023-08-10)
 
 ### Added
 
@@ -30,28 +34,28 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `ecovavs-deebot` library to v0.9.6-prerelease (thanks @mrbungle64!)
 - Bump `node` recommended versions to v16.20.2 or v18.17.1 or v20.5.1
 
-## 6.0.5 (2023-04-05)
-## 6.0.4 (2023-04-05)
-## 6.0.3 (2023-04-05)
+## v6.0.5 (2023-04-05)
+## v6.0.4 (2023-04-05)
+## v6.0.3 (2023-04-05)
 
 ### Changed
 
 - Bump `ecovavs-deebot` library to v0.9.5 (thanks @mrbungle64!)
 - Simplify log welcome messages
 
-## 6.0.2 (2023-03-24)
+## v6.0.2 (2023-03-24)
 
 ### Changed
 
 - Bump `ecovavs-deebot` library to v0.9.4 (thanks @mrbungle64!)
 
-## 6.0.1 (2023-03-14)
+## v6.0.1 (2023-03-14)
 
 ### Fixed
 
 - ` [GetNetInfo]` should be debug logging
 
-## 6.0.0 (2023-03-11)
+## v6.0.0 (2023-03-11)
 
 ### Breaking
 
@@ -66,7 +70,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `ecovavs-deebot` library to v0.9.3 (thanks @mrbungle64!)
 - Bump `node` recommended versions to v16.19.1 or v18.15.0
 
-## 5.3.2 (2023-01-07)
+## v5.3.2 (2023-01-07)
 
 ### Changed
 
@@ -78,13 +82,13 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 
 - Show correct service names for new accessories on new iOS version
 
-## 5.3.1 (2022-11-27)
+## v5.3.1 (2022-11-27)
 
 ### Fixed
 
 - A potential configuration issue when using multiple devices
 
-## 5.3.0 (2022-11-24)
+## v5.3.0 (2022-11-24)
 
 ### Added
 
@@ -96,7 +100,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `ecovavs-deebot` library to v0.9.0
 - Bump `node` recommended versions to v14.21.1 or v16.18.1 or v18.12.1
 
-## 5.2.0 (2022-09-25)
+## v5.2.0 (2022-09-25)
 
 ### Added
 
@@ -109,7 +113,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `node` recommended versions to v14.20.1 or v16.17.1
 - Updated dev dependencies
 
-## 5.1.0 (2022-08-28)
+## v5.1.0 (2022-08-28)
 
 ### Added
 
@@ -126,7 +130,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `node` recommended versions to v14.20.0 or v16.17.0
 - Bump `homebridge` recommended version to v1.5.0
 
-## 5.0.5 (2022-06-08)
+## v5.0.5 (2022-06-08)
 
 ### Changed
 
@@ -136,32 +140,32 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 
 - A potential issue showing errors in the logs
 
-## 5.0.4 (2022-05-28)
+## v5.0.4 (2022-05-28)
 
 ### Changed
 
 - More fixes and refactoring
 
-## 5.0.3 (2022-05-28)
+## v5.0.3 (2022-05-28)
 
 ### Changed
 
 - Bump `ecovacs-deebot` to v0.8.2
 
-## 5.0.2 (2022-05-22)
+## v5.0.2 (2022-05-22)
 
 ### Changed
 
 - Some refactoring
 
-## 5.0.1 (2022-05-22)
+## v5.0.1 (2022-05-22)
 
 ### Changed
 
 - Bump `node` recommended versions to v14.19.3 or v16.15.0
 - Bump `ecovacs-deebot` to v0.8.1
 
-## 5.0.0 (2022-05-07)
+## v5.0.0 (2022-05-07)
 
 ### Potentially Breaking Changes
 
@@ -174,7 +178,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `node` recommended versions to v14.19.1 or v16.14.2
 - Bump `ecovacs-deebot` to v0.8.0
 
-## 4.4.2 (2022-02-27)
+## v4.4.2 (2022-02-27)
 
 ### Changed
 
@@ -182,7 +186,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `homebridge` recommended version to v1.4.0
 - Bump `ecovacs-deebot` to v0.7.2
 
-## 4.4.1 (2022-01-15)
+## v4.4.1 (2022-01-15)
 
 ### Changed
 
@@ -193,7 +197,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 
 - Plugin crash for older versions of Homebridge
 
-## 4.4.0 (2022-01-05)
+## v4.4.0 (2022-01-05)
 
 ### Added
 
@@ -205,19 +209,19 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `homebridge` recommended version to v1.3.9
 - Updated dependencies
 
-## 4.3.3 (2021-12-29)
+## v4.3.3 (2021-12-29)
 
 ### Changed
 
 - Updated dependencies
 
-## 4.3.2 (2021-12-26)
+## v4.3.2 (2021-12-26)
 
 ### Changed
 
 - Updated dependencies
 
-## 4.3.1 (2021-12-18)
+## v4.3.1 (2021-12-18)
 
 ### Added
 
@@ -231,50 +235,50 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Bump `homebridge` recommended version to v1.3.8
 - Bump `node` recommended versions to v14.18.2 or v16.13.1
 
-## 4.2.7 (2021-10-03)
+## v4.2.7 (2021-10-03)
 
 ### Changed
 
 - Updated dependencies
 
-## 4.2.6 (2021-09-30)
+## v4.2.6 (2021-09-30)
 
 ### Changed
 
 - Recommended node versions bumped to v14.18.0 or v16.10.0
 
-## 4.2.5 (2021-09-09)
+## v4.2.5 (2021-09-09)
 
 ### Changed
 
 - Updated `ecovacs-deebot` library to v0.6.8
 
-## 4.2.4 (2021-09-09)
+## v4.2.4 (2021-09-09)
 
 ### Changed
 
 - Updated `ecovacs-deebot` library to v0.6.7
 
-## 4.2.3 (2021-09-09)
+## v4.2.3 (2021-09-09)
 
 ### Changed
 
 - `configureAccessory` function simplified to reduce chance of accessory cache retrieval failing
 
-## 4.2.2 (2021-09-05)
+## v4.2.2 (2021-09-05)
 
 ### Changed
 
 - Updated `ecovacs-deebot` library to v0.6.6
 
-## 4.2.1 (2021-09-02)
+## v4.2.1 (2021-09-02)
 
 ### Changed
 
 - Updated `ecovacs-deebot` library to v0.6.5
 - Recommended node version bumped to v14.17.6
 
-## 4.2.0 (2021-08-30)
+## v4.2.0 (2021-08-30)
 
 ### Changed
 
@@ -282,11 +286,11 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 - Updated `ecovacs-deebot` library to v0.6.3
 - Remove `node-machine-id` in favour of generating a client id based on ECOVACS username
 
-## 4.1.0 (2021-08-30)
+## v4.1.0 (2021-08-30)
 
 _Unpublished_
 
-## 4.0.2 (2021-08-12)
+## v4.0.2 (2021-08-12)
 
 ### Changed
 
@@ -297,13 +301,13 @@ _Unpublished_
 
 - Attempt to fix a situation when `node-machine-id` fails to obtain the machine uuid
 
-## 4.0.1 (2021-08-06)
+## v4.0.1 (2021-08-06)
 
 ### Changed
 
 - Updated `ecovacs-deebot` library to v0.6.1
 
-## 4.0.0 (2021-07-29)
+## v4.0.0 (2021-07-29)
 
 ### Added
 
@@ -318,19 +322,19 @@ _Unpublished_
   - Recommended node version bumped to v14.17.4
   - Recommended homebridge version bumped to v1.3.4
 
-## 3.4.0 (2021-07-22)
+## v3.4.0 (2021-07-22)
 
 ### Added
 
 - Support for cleaning 'Spot Areas' customised in the ECOVACS app
 
-## 3.3.1 (2021-07-18)
+## v3.3.1 (2021-07-18)
 
 ### Fixed
 
 - Don't refresh accessory if it hasn't initialised properly
 
-## 3.3.0 (2021-07-18)
+## v3.3.0 (2021-07-18)
 
 ### Changed
 
@@ -341,25 +345,25 @@ _Unpublished_
 
 ### Fixed
 
-- Attempt to fix an accessory duplication issue ([#37](https://github.com/bwp91/homebridge-deebot/issues/37))
+- Attempt to fix an accessory duplication issue ([#37](https://github.com/homebridge-plugins/homebridge-deebot/issues/37))
 
 ### Removed
 
 - `ignoredDevices` configuration option (see alternate way of ignore a device above)
 
-## 3.2.2 (2021-07-08)
+## v3.2.2 (2021-07-08)
 
 ### Changes
 
 - Revert node version bump to v14.17.3 (back to v14.17.2)
 
-## 3.2.1 (2021-07-07)
+## v3.2.1 (2021-07-07)
 
 ### Changed
 
 - Startup logging 'housekeeping'
 
-## 3.2.0 (2021-07-07)
+## v3.2.0 (2021-07-07)
 
 ### Added
 
@@ -384,7 +388,7 @@ _Unpublished_
 - Use `standard-prettier` code formatting
 - Recommended node version bump to v14.17.3
 
-## 3.1.0 (2021-05-10)
+## v3.1.0 (2021-05-10)
 
 ### Added
 
@@ -400,20 +404,20 @@ _Unpublished_
 - Removed `encodedPassword` config option
   - The plugin will now initially try the supplied password and if incorrect will attempt another login with a base64 decoded version
 
-## 3.0.3 (2021-05-05)
+## v3.0.3 (2021-05-05)
 
 ### Fixed
 
 - Fixes an issue where commands didn't send to the device properly
 
-## 3.0.2 (2021-05-04)
+## v3.0.2 (2021-05-04)
 
 ### Changed
 
 - Accessory 'identify' function will now add an entry to the log
 - Backend refactoring, function and variable name changes
 
-## 3.0.1 (2021-04-24)
+## v3.0.1 (2021-04-24)
 
 ### Requirements
 
@@ -434,7 +438,7 @@ _Unpublished_
 
 - ⚠️ The plugin now uses a **per-device** configuration
   - Current device-specific configurations will cease to work until you update your settings
-  - Refer to [the wiki](https://github.com/bwp91/homebridge-deebot/wiki/Configuration) for details regarding the new configuration
+  - Refer to [the wiki](https://github.com/homebridge-plugins/homebridge-deebot/wiki/Configuration) for details regarding the new configuration
 - Use the new `.onSet` methods available in Homebridge v1.3
 - Modified config schema to show titles/descriptions for non Homebridge UI users
 - Update wiki links in the Homebridge plugin-ui
@@ -449,7 +453,7 @@ _Unpublished_
 
 - Fixes an issue where the device name would not show in the logs if a device fails to initialise
 
-## 2.8.5 (2021-02-11)
+## v2.8.5 (2021-02-11)
 
 ### Changed
 
@@ -457,31 +461,31 @@ _Unpublished_
 - Updated minimum Homebridge to v1.1.7
 - Updated minimum Node to v14.15.5
 
-## 2.8.4 (2021-02-09)
+## v2.8.4 (2021-02-09)
 
 ### Changed
 
 - Updated client dependency `ecovacs-deebot` to v0.5.6
 
-## 2.8.3 (2021-02-08)
+## v2.8.3 (2021-02-08)
 
 ### Fixed
 
 - Hide the `Config entry [plugin_map] is unused and can be removed` notice for HOOBS users
 
-## 2.8.2 (2021-02-08)
+## v2.8.2 (2021-02-08)
 
 ### Fixed
 
 - Fixes a bug when adding a device to Homebridge
 
-## 2.8.1 (2021-02-08)
+## v2.8.1 (2021-02-08)
 
 ### Changed
 
 - Error stack will be hidden when the disabled plugin message appears in the log
 
-## 2.8.0 (2021-02-06)
+## v2.8.0 (2021-02-06)
 
 ### Added
 
@@ -498,14 +502,14 @@ _Unpublished_
 - [Backend] Major code refactoring
 - [Backend] Code comments
 
-## 2.7.2 (2021-01-30)
+## v2.7.2 (2021-01-30)
 
 ### Changed
 
 - Updated client dependency `ecovacs-deebot` to v0.5.5 which:
   - Added OZMO T5 and some more T8 models
 
-## 2.7.1 (2021-01-29)
+## v2.7.1 (2021-01-29)
 
 ### Changed
 
@@ -517,7 +521,7 @@ _Unpublished_
 
 - Corrected the attempt to disconnect from devices on Homebridge shutdown
 
-## 2.7.0 (2021-01-26)
+## v2.7.0 (2021-01-26)
 
 ### New
 
@@ -529,19 +533,19 @@ _Unpublished_
 
 - Default low battery status reduced from 20% to 15% to match Deebot's low battery alerts
 
-## 2.6.3 (2021-01-23)
+## v2.6.3 (2021-01-23)
 
 ### Changed
 
 - Backend - better handling of errors
 
-## 2.6.2 (2021-01-20)
+## v2.6.2 (2021-01-20)
 
 ### Changed
 
 - Updated dependencies
 
-## 2.6.1 (2021-01-14)
+## v2.6.1 (2021-01-14)
 
 ### Changed
 
@@ -549,7 +553,7 @@ _Unpublished_
 - Support for all valid country codes
 - Added CHANGELOG.md
 
-## 2.6.0 (2021-01-12)
+## v2.6.0 (2021-01-12)
 
 ### New
 
