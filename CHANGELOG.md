@@ -8,6 +8,7 @@ All notable changes to homebridge-ecovacs will be documented in this file.
 
 - add `lint` step to build workflow
 - add permissions to workflows
+- improvements to the deprecate workflow
 
 ## v7.1.0 (2025-07-12)
 
