@@ -4,6 +4,10 @@ All notable changes to homebridge-ecovacs will be documented in this file.
 
 ## v7.1.0 (Unreleased)
 
+### Notable Changes
+
+- set `strictValidation` to `true` in the config schema file
+
 ### Other Changes
 
 - github repo maintenance
