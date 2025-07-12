@@ -5,7 +5,7 @@
 
 # homebridge-ecovacs
 
-Homebridge plugin to integrate ECOVACS Deebot or Yeedi devices into HomeKit
+Homebridge plugin to integrate Ecovacs Deebot or Yeedi devices into HomeKit
 
 [![npm](https://img.shields.io/npm/v/@homebridge-plugins/homebridge-ecovacs/latest?label=latest)](https://www.npmjs.com/package/@homebridge-plugins/homebridge-ecovacs)
 [![npm](https://img.shields.io/npm/v/@homebridge-plugins/homebridge-ecovacs/beta?label=beta)](https://github.com/homebridge-plugins/homebridge-ecovacs/wiki/Beta-Version)
@@ -20,8 +20,8 @@ Homebridge plugin to integrate ECOVACS Deebot or Yeedi devices into HomeKit
 
 ### Plugin Information
 
-- This plugin allows you to view and control your ECOVACS or Yeedi devices within HomeKit. The plugin:
-  - requires your ECOVACS or Yeedi credentials to function
+- This plugin allows you to view and control your Ecovacs or Yeedi devices within HomeKit. The plugin:
+  - requires your Ecovacs or Yeedi credentials to function
   - uses a cloud-based connection (i.e. requires the internet)
 
 ### Prerequisites
@@ -59,5 +59,5 @@ Homebridge plugin to integrate ECOVACS Deebot or Yeedi devices into HomeKit
 
 ### Disclaimer
 
-- I am in no way affiliated with ECOVACS/Deebot/Yeedi and this plugin is a personal project that I maintain in my free time.
+- I am in no way affiliated with Ecovacs/Deebot/Yeedi and this plugin is a personal project that I maintain in my free time.
 - Use this plugin entirely at your own risk - please see licence for more information.

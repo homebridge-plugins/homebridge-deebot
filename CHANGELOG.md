@@ -2,11 +2,11 @@
 
 All notable changes to homebridge-ecovacs will be documented in this file.
 
-This project tries to adhere to [Semantic Versioning](http://semver.org/). In practice, this means that the version number will be incremented based on the following:
+## v7.1.0 (Unreleased)
 
-- `MAJOR` version when a minimum supported version of `homebridge` or `node` is increased to a new major version, or when a breaking change is made to the plugin config
-- `MINOR` version when a new device type is added, or when a new feature is added that is backwards-compatible
-- `PATCH` version when backwards-compatible bug fixes are implemented
+### Other Changes
+
+- github repo maintenance
 
 ## v7.0.2 (2025-07-11)
 
@@ -296,7 +296,7 @@ This project tries to adhere to [Semantic Versioning](http://semver.org/). In pr
 
 - Ignore `Robot is operational` error in log
 - Updated `ecovacs-deebot` library to v0.6.3
-- Remove `node-machine-id` in favour of generating a client id based on ECOVACS username
+- Remove `node-machine-id` in favour of generating a client id based on Ecovacs username
 
 ## v4.1.0 (2021-08-30)
 
@@ -338,7 +338,7 @@ _Unpublished_
 
 ### Added
 
-- Support for cleaning 'Spot Areas' customised in the ECOVACS app
+- Support for cleaning 'Spot Areas' customised in the Ecovacs app
 
 ## v3.3.1 (2021-07-18)
 
@@ -442,7 +442,7 @@ _Unpublished_
 
 - Configuration settings per Deebot device
 - Support for Chinese server login
-- Enter your ECOVACS password as a base64 encoded string and use the option `encodedPassword` to let the plugin know
+- Enter your Ecovacs password as a base64 encoded string and use the option `encodedPassword` to let the plugin know
 - More viewable information in the Homebridge plugin-ui:
   - Device model, company and an image of your device in case you didn't know what it looked like
 

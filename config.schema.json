@@ -16,7 +16,7 @@
       "useYeedi": {
         "title": "Use Yeedi Login",
         "type": "boolean",
-        "description": "Enable this for Yeedi login instead of ECOVACS."
+        "description": "Enable this for Yeedi login instead of Ecovacs."
       },
       "countryCode": {
         "title": "Country Code",
@@ -25,13 +25,13 @@
         "required": true
       },
       "username": {
-        "title": "ECOVACS/Yeedi Username",
+        "title": "Ecovacs/Yeedi Username",
         "required": true,
         "type": "string",
-        "description": "Your username, if your account is based in China you should use your ECOVACS ID."
+        "description": "Your username, if your account is based in China you should use your Ecovacs ID."
       },
       "password": {
-        "title": "ECOVACS/Yeedi Password",
+        "title": "Ecovacs/Yeedi Password",
         "required": true,
         "type": "string",
         "description": "Your password, can also be a base64 encoded version of your password."
@@ -56,7 +56,7 @@
             "deviceId": {
               "title": "Device ID",
               "type": "string",
-              "description": "ECOVACS Device ID of the device these settings apply to, can be of format E2000000000000000000 or 11111111-aaaa-bbbb-2222-cccccccccccc."
+              "description": "Ecovacs Device ID of the device these settings apply to, can be of format E2000000000000000000 or 11111111-aaaa-bbbb-2222-cccccccccccc."
             },
             "ignoreDevice": {
               "type": "boolean",
@@ -70,7 +70,7 @@
               "title": "Polling Interval",
               "type": "integer",
               "placeholder": 120,
-              "description": "An interval (in seconds) in which this device will refresh with ECOVACS. Set to 0 to disable, otherwise must be 30 or more."
+              "description": "An interval (in seconds) in which this device will refresh with Ecovacs. Set to 0 to disable, otherwise must be 30 or more."
             },
             "hideMotionSensor": {
               "title": "Hide Motion Sensor",

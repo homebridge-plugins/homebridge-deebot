@@ -11,6 +11,6 @@ assignees: ''
 
 * **Is your feature request related to a problem? Please describe.**
 
-* **Any particular ECOVACS devices that this relates to?**
+* **Any particular Ecovacs devices that this relates to?**
 
 * **Anything else?**

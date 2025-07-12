@@ -4,7 +4,7 @@
   "alias": "Deebot",
   "type": "module",
   "version": "7.0.2",
-  "description": "Homebridge plugin to integrate ECOVACS Deebot devices into HomeKit.",
+  "description": "Homebridge plugin to integrate Ecovacs Deebot devices into HomeKit.",
   "author": {
     "name": "bwp91",
     "email": "bwp91@icloud.com"
@@ -57,9 +57,9 @@
     "node": "^20 || ^22 || ^24"
   },
   "scripts": {
-    "lint": "eslint . --fix",
-    "postinstall": "patch-package",
-    "rebuild": "rm -rf package-lock.json && rm -rf node_modules && npm install"
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "npm run lint -- --fix",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.1.0",

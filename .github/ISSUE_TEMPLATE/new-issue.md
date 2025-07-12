@@ -23,7 +23,7 @@ assignees: ''
 
 * Which version of this plugin (homebridge-deebot) do you have? Has the issue started since upgrading from a previous version?
 
-* Which ECOVACS devices do you have that are causing issues? Please include product models if applicable.
+* Which Ecovacs devices do you have that are causing issues? Please include product models if applicable.
 
 ### Please paste any relevant logs below.
 <!-- ABOUT LOGS
