@@ -2,6 +2,12 @@
 
 All notable changes to homebridge-ecovacs will be documented in this file.
 
+## v7.2.2 (Unreleased)
+
+### Other Changes
+
+- add maintainer message
+
 ## v7.2.1 (2025-07-16)
 
 ### Other Changes
