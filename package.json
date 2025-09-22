@@ -67,7 +67,7 @@
     "patch-package": "^8.0.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.19.0"
+    "@antfu/eslint-config": "^5.4.1"
   },
   "overrides": {
     "ecovacs-deebot": {
