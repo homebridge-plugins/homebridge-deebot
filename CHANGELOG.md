@@ -1,6 +1,10 @@
 # Change Log
 
-All notable changes to homebridge-ecovacs will be documented in this file.
+All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
+
+## v7.2.4 (Unreleased)
+
+- update readme badges (use `shields.io`)
 
 ## v7.2.3 (2025-07-24)
 

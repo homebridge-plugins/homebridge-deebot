@@ -8,11 +8,9 @@
 Homebridge plugin to integrate Ecovacs Deebot or Yeedi devices into HomeKit
 
 [![npm](https://img.shields.io/npm/v/@homebridge-plugins/homebridge-ecovacs/latest?label=latest)](https://www.npmjs.com/package/@homebridge-plugins/homebridge-ecovacs)
-[![npm](https://img.shields.io/npm/v/@homebridge-plugins/homebridge-ecovacs/beta?label=beta)](https://github.com/homebridge-plugins/homebridge-ecovacs/wiki/Beta-Version)
-
-[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
-[![hoobs-certified](https://badgen.net/badge/HOOBS/certified/yellow?label=hoobs)](https://plugins.hoobs.org/plugin/homebridge-ecovacs)
-
+[![npm](https://img.shields.io/npm/v/@homebridge-plugins/homebridge-ecovacs/beta?label=beta)](https://github.com/homebridge-plugins/homebridge-ecovacs/wiki/Beta-Version)<br>
+[![verified-by-homebridge](https://img.shields.io/badge/homebridge-verified-blueviolet?color=%23491F59&style=flat)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+[![hoobs-certified](https://img.shields.io/badge/hoobs-certified-yellow)](https://plugins.hoobs.org/plugin/homebridge-ecovacs)<br>
 [![npm](https://img.shields.io/npm/dt/@homebridge-plugins/homebridge-ecovacs)](https://www.npmjs.com/package/@homebridge-plugins/homebridge-ecovacs)
 [![Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=hb-discord)](https://discord.com/channels/432663330281226270/742733745743855627)
 
