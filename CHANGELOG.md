@@ -6,6 +6,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 
 - update readme badges (use `shields.io`)
 - update workflows and npm publish via oidc
+- update dependencies
 
 ## v7.2.3 (2025-07-24)
 
