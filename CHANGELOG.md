@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v7.2.5 (Unreleased)
+
+### Changes
+
+- determine debug mode from `-D` flag
+
 ## v7.2.4 (2025-12-05)
 
 ### Changes
