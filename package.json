@@ -67,7 +67,7 @@
     "patch-package": "^8.0.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.7.1"
+    "@antfu/eslint-config": "^7.4.2"
   },
   "overrides": {
     "request": {
