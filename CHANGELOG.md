@@ -10,6 +10,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - updated dependencies
 - updated dependencies + lint rules
 - update workflow action versions
+- fix deprecate past releases script
 
 ## v7.2.4 (2025-12-05)
 
