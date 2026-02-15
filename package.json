@@ -3,8 +3,8 @@
   "displayName": "Homebridge Ecovacs",
   "alias": "Deebot",
   "type": "module",
-  "version": "7.2.4",
-  "description": "Homebridge plugin to integrate Ecovacs Deebot devices into HomeKit.",
+  "version": "7.3.0",
+  "description": "Homebridge plugin to integrate Ecovacs Deebot/Yeedi devices into HomeKit.",
   "author": {
     "name": "bwp91",
     "email": "bwp91@icloud.com"
@@ -75,7 +75,7 @@
       "canvas": {
         ".": "^2.11.1",
         "@mapbox/node-pre-gyp": {
-          "tar": "^7.5.7"
+          "tar": "^7.5.9"
         }
       },
       "simple-xmpp": {
