@@ -7,6 +7,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changes
 
 - dependency updates
+- remove support for node v20
 
 ## v7.3.0 (2026-02-16)
 
