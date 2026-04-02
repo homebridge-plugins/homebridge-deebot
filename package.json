@@ -62,20 +62,21 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@homebridge/plugin-ui-utils": "^2.2.0",
+    "@homebridge/plugin-ui-utils": "^2.2.3",
     "ecovacs-deebot": "^0.9.6-beta.12",
     "patch-package": "^8.0.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^7.4.3"
+    "@antfu/eslint-config": "^8.0.0"
   },
   "overrides": {
     "ecovacs-deebot": {
-      "axios": "^1.13.5",
+      "@xmldom/xmldom": "^0.9.9",
+      "axios": "^1.14.0",
       "canvas": {
         ".": "^2.11.1",
         "@mapbox/node-pre-gyp": {
-          "tar": "^7.5.9"
+          "tar": "^7.5.13"
         }
       },
       "simple-xmpp": {

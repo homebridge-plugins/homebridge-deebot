@@ -3,7 +3,7 @@
 </p>
 <span align="center">
 
-# homebridge-ecovacs
+## homebridge-ecovacs
 
 Homebridge plugin to integrate Ecovacs Deebot or Yeedi devices into HomeKit
 
