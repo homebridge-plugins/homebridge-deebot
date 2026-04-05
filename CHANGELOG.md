@@ -15,6 +15,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: clear cache after updateValue calls, not before
 - fix: correct error message for predefined area failures
 - fix: guard `refreshIntervals` in `pluginShutdown`
+- fix: use logDebug for `GetChargeState` in `externalReadyUpdate`
 
 ## v7.3.0 (2026-02-16)
 
