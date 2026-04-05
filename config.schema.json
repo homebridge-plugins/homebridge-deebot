@@ -700,7 +700,7 @@
       "type": "fieldset",
       "title": "Optional Settings",
       "expandable": true,
-      "items": ["disableDeviceLogging", "refreshTime"]
+      "items": ["disableDeviceLogging"]
     },
     {
       "key": "devices",
