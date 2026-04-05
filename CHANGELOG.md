@@ -10,6 +10,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - remove support for node v20
 - fix: shallow copy default config/device objects
 - fix: correct poll interval config access
+- fix: remove extra brace in clean update log
 
 ## v7.3.0 (2026-02-16)
 
