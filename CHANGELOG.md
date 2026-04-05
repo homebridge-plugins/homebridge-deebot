@@ -13,6 +13,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: remove extra brace in clean update log
 - fix: move accessory null check before first use
 - fix: clear cache after updateValue calls, not before
+- fix: correct error message for predefined area failures
 
 ## v7.3.0 (2026-02-16)
 
