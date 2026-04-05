@@ -11,6 +11,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: shallow copy default config/device objects
 - fix: correct poll interval config access
 - fix: remove extra brace in clean update log
+- fix: move accessory null check before first use
 
 ## v7.3.0 (2026-02-16)
 
