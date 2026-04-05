@@ -2,7 +2,7 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
-## v7.3.1 (Pending Release)
+## v7.4.0 (2026-04-05)
 
 ### Changes
 
