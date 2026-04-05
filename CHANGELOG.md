@@ -18,6 +18,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: use logDebug for `GetChargeState` in `externalReadyUpdate`
 - fix: use object over sparse array for virtual boundaries
 - fix: remove unused `refreshTime` config
+- fix: use `trim()` in `parseError` stack trace cleanup
 
 ## v7.3.0 (2026-02-16)
 
