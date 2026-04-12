@@ -67,14 +67,14 @@
     "patch-package": "^8.0.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^8.0.0"
+    "@antfu/eslint-config": "^8.1.1"
   },
   "overrides": {
     "ecovacs-deebot": {
       "@xmldom/xmldom": "^0.9.9",
-      "axios": "^1.14.0",
+      "axios": "^1.15.0",
       "canvas": {
-        ".": "^2.11.1",
+        ".": "^2.11.2",
         "@mapbox/node-pre-gyp": {
           "tar": "^7.5.13"
         }
@@ -84,7 +84,7 @@
           ".": "^3.1.11",
           "request": {
             "form-data": "^2.5.5",
-            "qs": "^6.15.0"
+            "qs": "^6.15.1"
           }
         }
       }
