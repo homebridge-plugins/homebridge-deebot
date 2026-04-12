@@ -2,6 +2,42 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.0.0 (Pending Release)
+
+Many thanks to @tainguyen2512 for working on the Matter and Typescript integrations 🎉
+
+### ⚠️ Breaking Changes
+
+- Refactor device representation to align with HomeKit vacuum behavior
+- Existing configurations may require re-setup in HomeKit
+
+### Changes
+
+- Add basic native HomeKit vacuum support for Ecovacs devices
+- Expose vacuum functionality using HomeKit-compatible services
+- Support core actions: start cleaning, stop, and return to dock
+- Map Ecovacs device states to HomeKit characteristics
+- Add basic battery status reporting
+
+### 🛠 Improvements
+
+- Improve state synchronization between Ecovacs API and HomeKit
+- Enhance overall stability when controlling devices from HomeKit
+
+### 🐛 Fixes
+
+- Fix inconsistent state updates during cleaning cycles
+- Fix issues with device responsiveness in certain scenarios
+
+### 📌 Notes
+
+- This is an initial implementation of native HomeKit vacuum support
+- Additional features and refinements will be added in future releases
+
+### Commits
+
+- feat: add basic typescript/matter support
+
 ## v7.4.0 (2026-04-05)
 
 ### Changes
@@ -98,6 +134,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ## v6.1.1 (2023-08-28)
 
 ⚠️ Note this will be the last version of the plugin to support Node 16.
+
 - Node 16 moves to 'end of life' on 2023-09-11 ([more info](https://nodejs.org/en/blog/announcements/nodejs16-eol))
 - This is in-line with the Homebridge guidelines on supporting node versions ([more info](https://github.com/homebridge/homebridge/wiki/How-To-Update-Node.js/))
 - If you are currently using Node 16, now is a good time to upgrade to Node 18 or 20 (see the link above for more info)
@@ -118,7 +155,9 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - Bump `node` recommended versions to v16.20.2 or v18.17.1 or v20.5.1
 
 ## v6.0.5 (2023-04-05)
+
 ## v6.0.4 (2023-04-05)
+
 ## v6.0.3 (2023-04-05)
 
 ### Changed
@@ -395,13 +434,11 @@ _Unpublished_
 ### Added
 
 - **Configuration**
-
   - Plugin will now check for duplicate device ID entries in the config and ignore them
 
 ### Changed
 
 - ⚠️ **Platform Versions**
-
   - Recommended node version bumped to v14.17.4
   - Recommended homebridge version bumped to v1.3.4
 

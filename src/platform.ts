@@ -1,9 +1,21 @@
+import type {
+  API,
+  DynamicPlatformPlugin,
+  Logging,
+  MatterAccessory,
+  PlatformAccessory,
+} from 'homebridge'
+
+import type { EcovacsConfig } from './config.js'
+
 import { Buffer } from 'node:buffer'
 import { createRequire } from 'node:module'
 import process from 'node:process'
 
 import { countries, EcoVacsAPI } from 'ecovacs-deebot'
 
+import { EcovacsRoboticVacuumAccessory } from './devices/index.js'
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js'
 import platformConsts from './utils/constants.js'
 import platformChars from './utils/custom-chars.js'
 import { parseError, sleep } from './utils/functions.js'
@@ -12,18 +24,40 @@ import platformLang from './utils/lang-en.js'
 const require = createRequire(import.meta.url)
 const plugin = require('../package.json')
 
+interface AccessoryExtraProps {
+  control: any
+  log: any
+  logDebug: any
+  logDebugWarn: any
+  logWarn: any
+  cacheShownMotionLowBatt: boolean
+}
+
 const devicesInHB = new Map()
 
-export default class {
-  constructor(log, config, api) {
+export class EcovacsPlatform implements DynamicPlatformPlugin {
+  [key: string]: any;
+  api: API
+
+  declare cusChar: InstanceType<typeof platformChars>
+
+  /** Cached Matter accessories restored at startup. */
+  public readonly matterAccessories: Map<string, MatterAccessory> = new Map()
+
+  /** Matter vacuum accessory instances keyed by device DID. */
+  private readonly matterVacuumMap: Map<string, EcovacsRoboticVacuumAccessory>
+    = new Map()
+
+  constructor(log: Logging, config: EcovacsConfig, api: API) {
+    this.api = api
+    this.log = log
+
     if (!log || !api) {
       return
     }
 
-    // Begin plugin initialisation
+    // Begin plugin initialization
     try {
-      this.api = api
-      this.log = log
       this.isBeta = process.argv.includes('-D')
 
       // Configuration objects for accessories
@@ -69,41 +103,81 @@ export default class {
       this.api.on('didFinishLaunching', () => this.pluginSetup())
       this.api.on('shutdown', () => this.pluginShutdown())
     } catch (err) {
-      // Catch any errors during initialisation
+      // Catch any errors during initialization
       log.warn('***** %s. *****', platformLang.disabling)
-      log.warn('***** %s. *****', parseError(err, [
-        platformLang.hbVersionFail,
-        platformLang.pluginNotConf,
-        platformLang.missingCreds,
-        platformLang.invalidCCode,
-        platformLang.invalidPassword,
-        platformLang.invalidUsername,
-      ]))
+      log.warn(
+        '***** %s. *****',
+        parseError(err, [
+          platformLang.hbVersionFail,
+          platformLang.pluginNotConf,
+          platformLang.missingCreds,
+          platformLang.invalidCCode,
+          platformLang.invalidPassword,
+          platformLang.invalidUsername,
+        ]),
+      )
     }
   }
 
-  applyUserConfig(config) {
+  applyUserConfig(config: EcovacsConfig) {
     // These shorthand functions save line space during config parsing
-    const logDefault = (k, def) => {
-      this.log.warn('%s [%s] %s %s.', platformLang.cfgItem, k, platformLang.cfgDef, def)
+    const logDefault = (k: string, def: string | number) => {
+      this.log.warn(
+        '%s [%s] %s %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgDef,
+        def,
+      )
     }
-    const logDuplicate = (k) => {
-      this.log.warn('%s [%s] %s.', platformLang.cfgItem, k, platformLang.cfgDup)
+    const logDuplicate = (k: string) => {
+      this.log.warn(
+        '%s [%s] %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgDup,
+      )
     }
-    const logIgnore = (k) => {
-      this.log.warn('%s [%s] %s.', platformLang.cfgItem, k, platformLang.cfgIgn)
+    const logIgnore = (k: string) => {
+      this.log.warn(
+        '%s [%s] %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgIgn,
+      )
     }
-    const logIgnoreItem = (k) => {
-      this.log.warn('%s [%s] %s.', platformLang.cfgItem, k, platformLang.cfgIgnItem)
+    const logIgnoreItem = (k: string) => {
+      this.log.warn(
+        '%s [%s] %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgIgnItem,
+      )
     }
-    const logIncrease = (k, min) => {
-      this.log.warn('%s [%s] %s %s.', platformLang.cfgItem, k, platformLang.cfgLow, min)
+    const logIncrease = (k: string, min: number) => {
+      this.log.warn(
+        '%s [%s] %s %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgLow,
+        min,
+      )
     }
-    const logQuotes = (k) => {
-      this.log.warn('%s [%s] %s.', platformLang.cfgItem, k, platformLang.cfgQts)
+    const logQuotes = (k: string) => {
+      this.log.warn(
+        '%s [%s] %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgQts,
+      )
     }
-    const logRemove = (k) => {
-      this.log.warn('%s [%s] %s.', platformLang.cfgItem, k, platformLang.cfgRmv)
+    const logRemove = (k: string) => {
+      this.log.warn(
+        '%s [%s] %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgRmv,
+      )
     }
 
     // Begin applying the user's config
@@ -232,12 +306,18 @@ export default class {
                     if (typeof v === 'string') {
                       logQuotes(`${key}.${id}.${k}`)
                     }
-                    const intVal = Number.parseInt(v, 10)
+                    const intVal = Number.parseInt(v as string, 10)
                     if (Number.isNaN(intVal)) {
-                      logDefault(`${key}.${id}.${k}`, platformConsts.defaultValues[k])
+                      logDefault(
+                        `${key}.${id}.${k}`,
+                        platformConsts.defaultValues[k],
+                      )
                       this.deviceConf[id][k] = platformConsts.defaultValues[k]
                     } else if (intVal < platformConsts.minValues[k]) {
-                      logIncrease(`${key}.${id}.${k}`, platformConsts.minValues[k])
+                      logIncrease(
+                        `${key}.${id}.${k}`,
+                        platformConsts.minValues[k],
+                      )
                       this.deviceConf[id][k] = platformConsts.minValues[k]
                     } else {
                       this.deviceConf[id][k] = intVal
@@ -248,9 +328,12 @@ export default class {
                     if (typeof v === 'string') {
                       logQuotes(`${key}.${id}.${k}`)
                     }
-                    const intVal = Number.parseInt(v, 10)
+                    const intVal = Number.parseInt(v as string, 10)
                     if (Number.isNaN(intVal)) {
-                      logDefault(`${key}.${id}.${k}`, platformConsts.defaultValues[k])
+                      logDefault(
+                        `${key}.${id}.${k}`,
+                        platformConsts.defaultValues[k],
+                      )
                       this.deviceConf[id][k] = platformConsts.defaultValues[k]
                     } else if (intVal === 0) {
                       this.deviceConf[id][k] = intVal
@@ -263,11 +346,15 @@ export default class {
                     break
                   }
                   case 'showAirDryingSwitch': {
-                    const inSet = platformConsts.allowed[k].includes(v)
+                    const inSet = platformConsts.allowed[k].includes(
+                      v as string,
+                    )
                     if (typeof v !== 'string' || !inSet) {
                       logIgnore(`${key}.${id}.${k}`)
                     } else {
-                      this.deviceConf[id][k] = inSet ? v : platformConsts.defaultValues[k]
+                      this.deviceConf[id][k] = inSet
+                        ? v
+                        : platformConsts.defaultValues[k]
                     }
                     break
                   }
@@ -338,9 +425,12 @@ export default class {
   }
 
   async pluginSetup() {
-    // Plugin has finished initialising so now onto setup
+    // Plugin has finished initializing so now onto setup
     try {
-      // Log that the plugin initialisation has been successful
+      // Ensure the Matter API is fully loaded before any access to api.matter
+      await (this.api as any).loadMatterAPI?.()
+
+      // Log that the plugin initialization has been successful
       this.log('%s.', platformLang.initialised)
 
       // Sort out some logging functions
@@ -357,18 +447,27 @@ export default class {
 
       // Connect to Ecovacs/Yeedi
       this.ecovacsAPI = new EcoVacsAPI(
-        EcoVacsAPI.getDeviceId(this.api.hap.uuid.generate(this.config.username)),
+        EcoVacsAPI.getDeviceId(
+          this.api.hap.uuid.generate(this.config.username),
+        ),
         this.config.countryCode,
         countries[this.config.countryCode].continent,
         this.config.useYeedi ? 'yeedi.com' : 'ecovacs.com',
       )
 
       // Display version of the ecovacs-deebot library in the log
-      this.log('%s v%s.', platformLang.ecovacsLibVersion, this.ecovacsAPI.getVersion())
+      this.log(
+        '%s v%s.',
+        platformLang.ecovacsLibVersion,
+        this.ecovacsAPI.getVersion(),
+      )
 
       // Attempt to log in to Ecovacs/Yeedi
       try {
-        await this.ecovacsAPI.connect(this.config.username, EcoVacsAPI.md5(this.config.password))
+        await this.ecovacsAPI.connect(
+          this.config.username,
+          EcoVacsAPI.md5(this.config.password),
+        )
       } catch (err) {
         // Check if password error and reattempt with base64 decoded version of password
         if (err.message?.includes('1010')) {
@@ -393,22 +492,61 @@ export default class {
         throw new TypeError(platformLang.deviceListFail)
       }
 
-      // Initialise each device into Homebridge
-      this.log('[%s] %s.', deviceList.length, platformLang.deviceCount(this.config.useYeedi ? 'Yeedi' : 'Ecovacs'))
-      for (let i = 0; i < deviceList.length; i += 1) {
-        await this.initialiseDevice(deviceList[i])
-      }
-
       // Start the polling intervals for device state refresh, each device may have a different refresh time
       // We add a refresh interval per device later in initialiseDevice()
       this.refreshIntervals = {}
+
+      // Initialize each device into Homebridge
+      this.log(
+        '[%s] %s.',
+        deviceList.length,
+        platformLang.deviceCount(this.config.useYeedi ? 'Yeedi' : 'Ecovacs'),
+      )
+      for (let i = 0; i < deviceList.length; i += 1) {
+        this.initialiseDevice(deviceList[i])
+      }
+
+      // ── Matter: register all RoboticVacuumCleaner accessories ───────────
+      if (this.api.isMatterAvailable?.() && this.api.isMatterEnabled?.()) {
+        const matterAccList = Array.from(
+          this.matterVacuumMap.values(),
+          a => a.toAccessory(),
+        )
+
+        if (matterAccList.length > 0) {
+          this.log(
+            '[Matter] Registering %s robotic vacuum device(s) via Matter.',
+            matterAccList.length,
+          )
+
+          await this.api.matter?.registerPlatformAccessories(
+            PLUGIN_NAME,
+            PLATFORM_NAME,
+            matterAccList,
+          )
+
+          // Mark each accessory as registered and flush any queued state updates
+          for (const vacuum of this.matterVacuumMap.values()) {
+            await vacuum.markRegistered()
+          }
+
+          this.log('[Matter] Registration complete.')
+        }
+      } else {
+        this.log.debug(
+          '[Matter] Skipping Matter registration (useMatter is disabled, or Matter is not available/enabled).',
+        )
+      }
 
       // Setup successful
       this.log('%s. %s', platformLang.complete, platformLang.welcome)
     } catch (err) {
       // Catch any errors during setup
       this.log.warn('***** %s. *****', platformLang.disabling)
-      this.log.warn('***** %s. *****', parseError(err, [platformLang.deviceListFail]))
+      this.log.warn(
+        '***** %s. *****',
+        parseError(err, [platformLang.deviceListFail]),
+      )
       this.pluginShutdown()
     }
   }
@@ -421,11 +559,16 @@ export default class {
         clearInterval(this.refreshIntervals[id])
       })
 
-      // Disconnect from each Ecovacs/Yeedi device
+      // Disconnect from each Ecovacs/Yeedi HAP device
       devicesInHB.forEach((accessory) => {
         if (accessory.control?.is_ready) {
           accessory.control.disconnect()
         }
+      })
+
+      // Disconnect from each Matter device
+      this.matterVacuumMap.forEach((vacuum) => {
+        vacuum.disconnect()
       })
     } catch (err) {
       // No need to show errors at this point
@@ -445,6 +588,11 @@ export default class {
         return
       }
 
+      // In Matter-only mode, skip HAP registration entirely
+      if (this.api.isMatterEnabled?.()) {
+        return this.initialiseMatterOnlyDevice(device)
+      }
+
       // Load the device control information from Ecovacs/Yeedi
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
@@ -456,7 +604,8 @@ export default class {
       )
 
       // Get the cached accessory or add to Homebridge if it doesn't exist
-      const accessory = devicesInHB.get(uuid) || this.addAccessory(loadedDevice)
+      const accessory
+        = devicesInHB.get(uuid) || this.addAccessory(loadedDevice)
 
       // Final check the accessory now exists in Homebridge
       if (!accessory) {
@@ -467,17 +616,23 @@ export default class {
 
       // Sort out some logging functions per accessory
       if (this.isBeta) {
-        accessory.log = msg => this.log('[%s] %s.', accessory.displayName, msg)
-        accessory.logWarn = msg => this.log.warn('[%s] %s.', accessory.displayName, msg)
-        accessory.logDebug = msg => this.log('[%s] %s.', accessory.displayName, msg)
-        accessory.logDebugWarn = msg => this.log.warn('[%s] %s.', accessory.displayName, msg)
+        accessory.log = msg =>
+          this.log('[%s] %s.', accessory.displayName, msg)
+        accessory.logWarn = msg =>
+          this.log.warn('[%s] %s.', accessory.displayName, msg)
+        accessory.logDebug = msg =>
+          this.log('[%s] %s.', accessory.displayName, msg)
+        accessory.logDebugWarn = msg =>
+          this.log.warn('[%s] %s.', accessory.displayName, msg)
       } else {
         if (this.config.disableDeviceLogging) {
           accessory.log = () => {}
           accessory.logWarn = () => {}
         } else {
-          accessory.log = msg => this.log('[%s] %s.', accessory.displayName, msg)
-          accessory.logWarn = msg => this.log.warn('[%s] %s.', accessory.displayName, msg)
+          accessory.log = msg =>
+            this.log('[%s] %s.', accessory.displayName, msg)
+          accessory.logWarn = msg =>
+            this.log.warn('[%s] %s.', accessory.displayName, msg)
         }
         accessory.logDebug = () => {}
         accessory.logDebugWarn = () => {}
@@ -488,7 +643,9 @@ export default class {
       accessory.context.lastMsg = ''
 
       // Add the 'clean' switch service if it doesn't already exist
-      const cleanService = accessory.getService('Clean') || accessory.addService(this.hapServ.Switch, 'Clean', 'clean')
+      const cleanService
+        = accessory.getService('Clean')
+          || accessory.addService(this.hapServ.Switch, 'Clean', 'clean')
       if (!cleanService.testCharacteristic(this.hapChar.ConfiguredName)) {
         cleanService.addCharacteristic(this.hapChar.ConfiguredName)
         cleanService.updateCharacteristic(this.hapChar.ConfiguredName, 'Clean')
@@ -499,10 +656,15 @@ export default class {
       }
 
       // Add the 'charge' switch service if it doesn't already exist
-      const chargeService = accessory.getService('Go Charge') || accessory.addService(this.hapServ.Switch, 'Go Charge', 'gocharge')
+      const chargeService
+        = accessory.getService('Go Charge')
+          || accessory.addService(this.hapServ.Switch, 'Go Charge', 'gocharge')
       if (!chargeService.testCharacteristic(this.hapChar.ConfiguredName)) {
         chargeService.addCharacteristic(this.hapChar.ConfiguredName)
-        chargeService.updateCharacteristic(this.hapChar.ConfiguredName, 'Go Charge')
+        chargeService.updateCharacteristic(
+          this.hapChar.ConfiguredName,
+          'Go Charge',
+        )
       }
       if (!chargeService.testCharacteristic(this.hapChar.ServiceLabelIndex)) {
         chargeService.addCharacteristic(this.hapChar.ServiceLabelIndex)
@@ -523,9 +685,13 @@ export default class {
         // Add the set characteristic
         cleanService
           .getCharacteristic(this.cusChar.PredefinedArea)
-          .onSet(async value => this.internalPredefinedAreaUpdate(accessory, value))
+          .onSet(async value =>
+            this.internalPredefinedAreaUpdate(accessory, value),
+          )
       } else if (cleanService.testCharacteristic(this.cusChar.PredefinedArea)) {
-        cleanService.removeCharacteristic(cleanService.getCharacteristic(this.cusChar.PredefinedArea))
+        cleanService.removeCharacteristic(
+          cleanService.getCharacteristic(this.cusChar.PredefinedArea),
+        )
       }
 
       // Add the set handler to the 'clean' switch on/off characteristic
@@ -533,10 +699,11 @@ export default class {
         .getCharacteristic(this.hapChar.On)
         .updateValue(accessory.context.cacheClean === 'auto')
         .removeOnSet()
-        .onSet(async value => this.internalCleanUpdate(accessory, value))
+        .onSet(async (value: boolean) => this.internalCleanUpdate(accessory, value))
 
       // Add the set handler to the 'max speed' switch on/off characteristic
-      cleanService.getCharacteristic(this.cusChar.MaxSpeed)
+      cleanService
+        .getCharacteristic(this.cusChar.MaxSpeed)
         .onSet(async value => this.internalSpeedUpdate(accessory, value))
 
       // Add the set handler to the 'charge' switch on/off characteristic
@@ -547,18 +714,30 @@ export default class {
         .onSet(async value => this.internalChargeUpdate(accessory, value))
 
       // Add the 'attention' motion service if it doesn't already exist
-      if (!accessory.getService('Attention') && !accessory.context.rawConfig.hideMotionSensor) {
-        accessory.addService(this.hapServ.MotionSensor, 'Attention', 'attention')
+      if (
+        !accessory.getService('Attention')
+        && !accessory.context.rawConfig.hideMotionSensor
+      ) {
+        accessory.addService(
+          this.hapServ.MotionSensor,
+          'Attention',
+          'attention',
+        )
       }
 
       // Remove the 'attention' motion service if it exists and user doesn't want it
-      if (accessory.getService('Attention') && accessory.context.rawConfig.hideMotionSensor) {
+      if (
+        accessory.getService('Attention')
+        && accessory.context.rawConfig.hideMotionSensor
+      ) {
         accessory.removeService(accessory.getService('Attention'))
       }
 
       // Set the motion sensor off if exists when the plugin initially loads
       if (accessory.getService('Attention')) {
-        accessory.getService('Attention').updateCharacteristic(this.hapChar.MotionDetected, false)
+        accessory
+          .getService('Attention')
+          .updateCharacteristic(this.hapChar.MotionDetected, false)
       }
 
       // Add the battery service if it doesn't already exist
@@ -567,24 +746,41 @@ export default class {
       }
 
       // Add the 'battery' humidity service if it doesn't already exist and user wants it
-      if (!accessory.getService('Battery Level') && accessory.context.rawConfig.showBattHumidity) {
-        accessory.addService(this.hapServ.HumiditySensor, 'Battery Level', 'batterylevel')
+      if (
+        !accessory.getService('Battery Level')
+        && accessory.context.rawConfig.showBattHumidity
+      ) {
+        accessory.addService(
+          this.hapServ.HumiditySensor,
+          'Battery Level',
+          'batterylevel',
+        )
       }
 
       // Remove the 'battery' humidity service if it exists and user doesn't want it
-      if (accessory.getService('Battery Level') && !accessory.context.rawConfig.showBattHumidity) {
+      if (
+        accessory.getService('Battery Level')
+        && !accessory.context.rawConfig.showBattHumidity
+      ) {
         accessory.removeService(accessory.getService('Battery Level'))
       }
 
-      // Add or remove the 'air drying' switch service according to the configuration (if it doesn't already exist) and add the set handler to the 'air drying' switch on/off characteristic
+      // Add or remove the 'air drying' switch service according to the configuration
+      // (if it doesn't already exist) and add the set handler to the on/off characteristic
       if (
         accessory.context.rawConfig.showAirDryingSwitch === 'yes'
-        || (accessory.context.rawConfig.showAirDryingSwitch === 'presetting' && loadedDevice.hasAirDrying())
+        || (accessory.context.rawConfig.showAirDryingSwitch === 'presetting'
+          && loadedDevice.hasAirDrying())
       ) {
-        const dryingService = accessory.getService('Air Drying') || accessory.addService(this.hapServ.Switch, 'Air Drying', 'airdrying')
+        const dryingService
+          = accessory.getService('Air Drying')
+            || accessory.addService(this.hapServ.Switch, 'Air Drying', 'airdrying')
         if (!dryingService.testCharacteristic(this.hapChar.ConfiguredName)) {
           dryingService.addCharacteristic(this.hapChar.ConfiguredName)
-          dryingService.updateCharacteristic(this.hapChar.ConfiguredName, 'Air Drying')
+          dryingService.updateCharacteristic(
+            this.hapChar.ConfiguredName,
+            'Air Drying',
+          )
         }
         if (!dryingService.testCharacteristic(this.hapChar.ServiceLabelIndex)) {
           dryingService.addCharacteristic(this.hapChar.ServiceLabelIndex)
@@ -595,7 +791,9 @@ export default class {
           .getCharacteristic(this.hapChar.On)
           .updateValue(accessory.context.cacheAirDrying === 'airdrying')
           .removeOnSet()
-          .onSet(async value => this.internalAirDryingUpdate(accessory, value))
+          .onSet(async value =>
+            this.internalAirDryingUpdate(accessory, value),
+          )
       } else if (accessory.getService('Air Drying')) {
         accessory.removeService(accessory.getService('Air Drying'))
         accessory.logDebug('air drying service removed')
@@ -621,8 +819,11 @@ export default class {
         }
 
         // Add the set handler to the 'true detect' switch on/off characteristic
-        cleanService.getCharacteristic(this.cusChar.TrueDetect)
-          .onSet(async value => this.internalTrueDetectUpdate(accessory, value))
+        cleanService
+          .getCharacteristic(this.cusChar.TrueDetect)
+          .onSet(async value =>
+            this.internalTrueDetectUpdate(accessory, value),
+          )
       } else if (accessory.getService('TrueDetect')) {
         // Remove TrueDetect service if exists
         accessory.removeService(accessory.getService('TrueDetect'))
@@ -650,7 +851,9 @@ export default class {
 
       // Set up a listener for the device 'CurrentCustomAreaValues' event
       accessory.control.on('CurrentCustomAreaValues', (newVal) => {
-        accessory.logDebug(`CurrentCustomAreaValues: ${JSON.stringify(newVal)}`)
+        accessory.logDebug(
+          `CurrentCustomAreaValues: ${JSON.stringify(newVal)}`,
+        )
       })
 
       // Set up a listener for the device 'CleanSpeed' event
@@ -739,16 +942,17 @@ export default class {
         if (vbs) {
           accessory.logDebug(`MapVirtualBoundaries: ${JSON.stringify(vbs)}`)
           const vbsCombined = [...vbs.mapVirtualWalls, ...vbs.mapNoMopZones]
-          const virtualBoundaryMap = {}
-          vbsCombined.forEach((vb) => {
-            virtualBoundaryMap[vb.mapVirtualBoundaryID] = vb
+          const virtualBoundaryArray: any[] = []
+          Object.keys(vbsCombined).forEach((key) => {
+            virtualBoundaryArray[vbsCombined[key].mapVirtualBoundaryID]
+              = vbsCombined[key]
           })
-          Object.values(virtualBoundaryMap).forEach((vb) => {
+          Object.keys(virtualBoundaryArray).forEach((key) => {
             accessory.control.run(
               'GetVirtualBoundaryInfo',
               vbs.mapID,
-              vb.mapVirtualBoundaryID,
-              vb.mapVirtualBoundaryType,
+              virtualBoundaryArray[key].mapVirtualBoundaryID,
+              virtualBoundaryArray[key].mapVirtualBoundaryType,
             )
           })
         }
@@ -766,9 +970,13 @@ export default class {
       // Refresh the current state of all the accessories
       this.refreshAccessory(accessory)
       const { pollInterval } = accessory.context.rawConfig || platformConsts.defaultValues
+
       if (pollInterval > 0) {
         this.refreshIntervals[device.did] = setInterval(() => {
-          devicesInHB.get(this.api.hap.uuid.generate(device.did)).control?.refresh()
+          devicesInHB
+            .get(this.api.hap.uuid.generate(device.did))
+            .control
+            ?.refresh()
         }, pollInterval * 1000)
       }
 
@@ -800,7 +1008,12 @@ export default class {
       }, 5000)
     } catch (err) {
       const dName = device.nick || device.did
-      this.log.warn('[%s] %s %s.', dName, platformLang.devNotInit, parseError(err, [platformLang.accNotFound]))
+      this.log.warn(
+        '[%s] %s %s.',
+        dName,
+        platformLang.devNotInit,
+        parseError(err, [platformLang.accNotFound]),
+      )
       this.log.warn(err)
     }
   }
@@ -827,7 +1040,9 @@ export default class {
         accessory.control.run('GetAirDrying')
       }
 
-      accessory.logDebug(`${platformLang.sendCmd} [GetCleanState${accessory.context.commandSuffix}]`)
+      accessory.logDebug(
+        `${platformLang.sendCmd} [GetCleanState${accessory.context.commandSuffix}]`,
+      )
       accessory.control.run(`GetCleanState${accessory.context.commandSuffix}`)
 
       accessory.logDebug(`${platformLang.sendCmd} [GetCleanSpeed]`)
@@ -862,9 +1077,74 @@ export default class {
     }
   }
 
-  addAccessory(device) {
-    // Add an accessory to Homebridge
+  /** Initialise a device using the Matter path only (no HAP accessory). */
+  initialiseMatterOnlyDevice(device) {
+    const dName = device.nick || device.did
+    try {
+      // Remove any existing HAP accessory for this device to avoid duplicates
+      const uuid = this.api.hap.uuid.generate(device.did)
+      if (devicesInHB.has(uuid)) {
+        this.removeAccessory(devicesInHB.get(uuid))
+      }
+
+      // Load the device control object from Ecovacs/Yeedi
+      const loadedDevice = this.ecovacsAPI.getVacBot(
+        this.ecovacsAPI.uid,
+        EcoVacsAPI.REALM,
+        this.ecovacsAPI.resource,
+        this.ecovacsAPI.user_access_token,
+        device,
+        countries[this.config.countryCode].continent,
+      )
+
+      // Create and store the Matter accessory
+      const matterVacuum = new EcovacsRoboticVacuumAccessory(
+        this.api,
+        this.log,
+        {
+          did: device.did,
+          nick: loadedDevice.getNickname?.() || device.nick || device.did,
+          company: device.company,
+          model: device.deviceModel,
+          isV2: loadedDevice.is950type_V2(),
+        },
+      )
+      this.matterVacuumMap.set(device.did, matterVacuum)
+
+      // Connect to the device and attach Matter event listeners
+      loadedDevice.connect()
+      matterVacuum.connectControl(loadedDevice)
+
+      // Optional polling
+      const deviceConf
+        = this.deviceConf?.[device.did] || platformConsts.defaultDevice
+      const pollInterval
+        = deviceConf.pollInterval ?? platformConsts.defaultValues.pollInterval
+      if (pollInterval > 0) {
+        this.refreshIntervals[device.did] = setInterval(() => {
+          loadedDevice.run?.('GetBatteryState')
+          loadedDevice.run?.('GetChargeState')
+          loadedDevice.run?.(
+            `GetCleanState${loadedDevice.is950type_V2() ? '_V2' : ''}`,
+          )
+          loadedDevice.run?.('GetCleanSpeed')
+        }, pollInterval * 1000)
+      }
+
+      this.log('[%s] [Matter] %s.', dName, platformLang.devInit)
+    } catch (err) {
+      this.log.warn(
+        '[%s] %s %s.',
+        dName,
+        platformLang.devNotInit,
+        parseError(err, [platformLang.accNotFound]),
+      )
+    }
+  }
+
+  addAccessory(device): PlatformAccessory | false {
     let displayName = 'Unknown'
+
     try {
       displayName = device.vacuum.nick || device.vacuum.did
       const accessory = new this.api.platformAccessory(
@@ -872,7 +1152,7 @@ export default class {
         this.api.hap.uuid.generate(device.vacuum.did),
       )
       accessory
-        .getService(this.hapServ.AccessoryInformation)
+        .getService(this.hapServ.AccessoryInformation)!
         .setCharacteristic(this.hapChar.Name, displayName)
         .setCharacteristic(this.hapChar.ConfiguredName, displayName)
         .setCharacteristic(this.hapChar.SerialNumber, device.vacuum.did)
@@ -887,51 +1167,90 @@ export default class {
       accessory.context.ecoClass = device.vacuum.class
       accessory.context.ecoResource = device.vacuum.resource
       accessory.context.ecoImage = device.deviceImageURL
-      this.api.registerPlatformAccessories(plugin.name, plugin.alias, [accessory])
+
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ])
+
       devicesInHB.set(accessory.UUID, accessory)
+
       this.log('[%s] %s.', displayName, platformLang.devAdd)
+
       return accessory
     } catch (err) {
-      // Catch any errors during add
-      this.log.warn('[%s] %s %s.', displayName, platformLang.devNotAdd, parseError(err))
+      // Catch any errors during adding
+      this.log.warn(
+        '[%s] %s %s.',
+        displayName,
+        platformLang.devNotAdd,
+        parseError(err),
+      )
+
       return false
     }
   }
 
-  configureAccessory(accessory) {
-    // Add the configured accessory to our global map
-    devicesInHB.set(accessory.UUID, accessory)
-    accessory
-      .getService('Clean')
-      .getCharacteristic(this.api.hap.Characteristic.On)
-      .onSet(() => {
-        this.log.warn('[%s] %s.', accessory.displayName, platformLang.accNotReady)
-        throw new this.api.hap.HapStatusError(-70402)
-      })
-      .updateValue(new this.api.hap.HapStatusError(-70402))
-    accessory
-      .getService('Go Charge')
-      .getCharacteristic(this.api.hap.Characteristic.On)
-      .onSet(() => {
-        this.log.warn('[%s] %s.', accessory.displayName, platformLang.accNotReady)
-        throw new this.api.hap.HapStatusError(-70402)
-      })
-      .updateValue(new this.api.hap.HapStatusError(-70402))
+  /**
+   * Called by Homebridge when a cached Matter accessory is restored from disk.
+   */
+  configureMatterAccessory(accessory: MatterAccessory): void {
+    this.log.debug('Loading cached Matter accessory:', accessory.displayName)
+    this.matterAccessories.set(accessory.UUID, accessory)
   }
 
-  removeAccessory(accessory) {
+  configureAccessory(accessory: PlatformAccessory): void {
+    // Add the configured accessory to our global map
+    devicesInHB.set(accessory.UUID, accessory)
+
+    accessory
+      .getService('Clean')
+      ?.getCharacteristic(this.api.hap.Characteristic.On)
+      ?.onSet(() => {
+        this.log.warn(
+          '[%s] %s.',
+          accessory.displayName,
+          platformLang.accNotReady,
+        )
+        throw new this.api.hap.HapStatusError(-70402)
+      })
+      ?.updateValue(new this.api.hap.HapStatusError(-70402))
+
+    accessory
+      .getService('Go Charge')
+      ?.getCharacteristic(this.api.hap.Characteristic.On)
+      ?.onSet(() => {
+        this.log.warn(
+          '[%s] %s.',
+          accessory.displayName,
+          platformLang.accNotReady,
+        )
+        throw new this.api.hap.HapStatusError(-70402)
+      })
+      ?.updateValue(new this.api.hap.HapStatusError(-70402))
+  }
+
+  removeAccessory(accessory: PlatformAccessory) {
     // Remove an accessory from Homebridge
     try {
-      this.api.unregisterPlatformAccessories(plugin.name, plugin.alias, [accessory])
+      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ])
+
       devicesInHB.delete(accessory.UUID)
+
       this.log('[%s] %s.', accessory.displayName, platformLang.devRemove)
     } catch (err) {
       // Catch any errors during remove
-      this.log.warn('[%s] %s %s.', accessory.displayName, platformLang.devNotRemove, parseError(err))
+      this.log.warn(
+        '[%s] %s %s.',
+        accessory.displayName,
+        platformLang.devNotRemove,
+        parseError(err),
+      )
     }
   }
 
-  async internalCleanUpdate(accessory, value) {
+  async internalCleanUpdate(accessory: PlatformAccessory & AccessoryExtraProps, value: boolean) {
     try {
       // Don't continue if we can't send commands to the device
       if (!accessory.control) {
@@ -945,7 +1264,9 @@ export default class {
       await sleep(1)
 
       // Turn the 'charge' switch off since we have commanded the 'clean' switch
-      accessory.getService('Go Charge').updateCharacteristic(this.hapChar.On, false)
+      accessory
+        .getService('Go Charge')
+        ?.updateCharacteristic(this.hapChar.On, false)
 
       // Select the correct command to run, either start or stop cleaning
       const order = value ? `Clean${accessory.context.commandSuffix}` : 'Stop'
@@ -958,19 +1279,24 @@ export default class {
       accessory.control.run(order)
     } catch (err) {
       // Catch any errors during the process
-      accessory.logWarn(`${platformLang.cleanFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`)
+      accessory.logWarn(
+        `${platformLang.cleanFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`,
+      )
 
       // Throw a 'no response' error and set a timeout to revert this after 2 seconds
       setTimeout(() => {
         accessory
           .getService('Clean')
-          .updateCharacteristic(this.hapChar.On, accessory.context.cacheClean === 'auto')
+          ?.updateCharacteristic(
+            this.hapChar.On,
+            accessory.context.cacheClean === 'auto',
+          )
       }, 2000)
       throw new this.hapErr(-70402)
     }
   }
 
-  async internalSpeedUpdate(accessory, value) {
+  async internalSpeedUpdate(accessory: PlatformAccessory & AccessoryExtraProps, value: boolean) {
     try {
       // Don't continue if we can't send commands to the device
       if (!accessory.control) {
@@ -980,30 +1306,37 @@ export default class {
         throw new Error(platformLang.errNotReady)
       }
 
-      // Set speed to max (3) if value is true otherwise set to standard (2)
+      // Set speed to max (3) if value is true, otherwise set to standard (2)
       const command = value ? 3 : 2
 
       // Log the update
-      accessory.log(`${platformLang.curSpeed} [${platformConsts.speed2Label[command]}]`)
+      accessory.log(
+        `${platformLang.curSpeed} [${platformConsts.speed2Label[command]}]`,
+      )
 
       // Send the command
       accessory.logDebug(`${platformLang.sendCmd} [SetCleanSpeed: ${command}]`)
       accessory.control.run('SetCleanSpeed', command)
     } catch (err) {
       // Catch any errors during the process
-      accessory.logWarn(`${platformLang.speedFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`)
+      accessory.logWarn(
+        `${platformLang.speedFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`,
+      )
 
       // Throw a 'no response' error and set a timeout to revert this after 2 seconds
       setTimeout(() => {
         accessory
           .getService('Clean')
-          .updateCharacteristic(this.cusChar.MaxSpeed, [3, 4].includes(accessory.context.cacheSpeed))
+          ?.updateCharacteristic(
+            this.cusChar.MaxSpeed,
+            [3, 4].includes(accessory.context.cacheSpeed),
+          )
       }, 2000)
       throw new this.hapErr(-70402)
     }
   }
 
-  async internalPredefinedAreaUpdate(accessory, value) {
+  async internalPredefinedAreaUpdate(accessory: PlatformAccessory & AccessoryExtraProps, value: number) {
     try {
       // Don't continue if we can't send commands to the device
       if (!accessory.control) {
@@ -1013,7 +1346,7 @@ export default class {
         throw new Error(platformLang.errNotReady)
       }
 
-      // Eve app for some reason still sends values with decimal places
+      // Eve app, for some reason, still sends values with decimal places
       value = Math.round(value)
 
       // A value of 0 doesn't do anything
@@ -1023,9 +1356,7 @@ export default class {
       }
 
       // Avoid quick switching with this function
-      const updateKey = Math.random()
-        .toString(36)
-        .slice(2, 10)
+      const updateKey = Math.random().toString(36).slice(2, 10)
       accessory.context.lastCommandKey = updateKey
       await sleep(1)
       if (updateKey !== accessory.context.lastCommandKey) {
@@ -1033,7 +1364,7 @@ export default class {
         return
       }
 
-      // Obtain the area type from the device config
+      // Get the area type from the device config
       const areaType = accessory.context.rawConfig[`areaType${value}`]
 
       // Don't continue if no command type for this number has been configured
@@ -1043,10 +1374,13 @@ export default class {
 
       accessory.log(`${platformLang.typeForArea} ${value}: ${areaType}`)
 
-      // Obtain the command from the device config
-      const command = accessory.context.rawConfig[areaType === 'spotArea'
-        ? `spotAreaIDs${value}`
-        : `customAreaCoordinates${value}`]
+      // Get the command from the device config
+      const command
+        = accessory.context.rawConfig[
+          areaType === 'spotArea'
+            ? `spotAreaIDs${value}`
+            : `customAreaCoordinates${value}`
+        ]
 
       // Don't continue if no command for this number has been configured
       if (!command) {
@@ -1058,7 +1392,9 @@ export default class {
       // Send the command
       switch (areaType) {
         case 'spotArea':
-          accessory.logDebug(`${platformLang.sendCmd} [SpotArea${accessory.context.commandSuffix}: ${command}]`)
+          accessory.logDebug(
+            `${platformLang.sendCmd} [SpotArea${accessory.context.commandSuffix}: ${command}]`,
+          )
 
           if (accessory.context.commandSuffix === '_V2') {
             accessory.control.run('SpotArea_V2', command)
@@ -1068,7 +1404,9 @@ export default class {
           break
 
         case 'customArea':
-          accessory.logDebug(`${platformLang.sendCmd} [CustomArea${accessory.context.commandSuffix}: ${command}]`)
+          accessory.logDebug(
+            `${platformLang.sendCmd} [CustomArea${accessory.context.commandSuffix}: ${command}]`,
+          )
 
           if (accessory.context.commandSuffix === '_V2') {
             accessory.control.run('CustomArea_V2', command)
@@ -1078,15 +1416,22 @@ export default class {
           break
 
         default:
-          throw new Error(`${areaType}: ${platformLang.unknownCommandTypeForArea}`)
+          throw new Error(
+            `${areaType}: ${platformLang.unknownCommandTypeForArea}`,
+          )
       }
 
       accessory.log(platformLang.commandSent)
 
       // Set the value back to 0 after two seconds and turn the main ON switch on
       setTimeout(() => {
-        accessory.getService('Clean').updateCharacteristic(this.cusChar.PredefinedArea, 0)
-        accessory.getService('Clean').updateCharacteristic(this.hapChar.On, true)
+        accessory
+          .getService('Clean')
+          ?.updateCharacteristic(this.cusChar.PredefinedArea, 0)
+
+        accessory
+          .getService('Clean')
+          ?.updateCharacteristic(this.hapChar.On, true)
         accessory.log(platformLang.characteristicsReset)
       }, 2000)
     } catch (err) {
@@ -1095,13 +1440,16 @@ export default class {
 
       // Throw a 'no response' error and set a timeout to revert this after 2 seconds
       setTimeout(() => {
-        accessory.getService('Clean').updateCharacteristic(this.cusChar.PredefinedArea, 0)
+        accessory
+          .getService('Clean')
+          ?.updateCharacteristic(this.cusChar.PredefinedArea, 0)
       }, 2000)
+
       throw new this.hapErr(-70402)
     }
   }
 
-  async internalChargeUpdate(accessory, value) {
+  async internalChargeUpdate(accessory: PlatformAccessory & AccessoryExtraProps, value: boolean) {
     try {
       // Don't continue if we can't send commands to the device
       if (!accessory.control) {
@@ -1116,7 +1464,9 @@ export default class {
 
       // Don't continue if the device is already charging
       const battService = accessory.getService(this.hapServ.Battery)
-      if (battService.getCharacteristic(this.hapChar.ChargingState).value !== 0) {
+      if (
+        battService?.getCharacteristic(this.hapChar.ChargingState).value !== 0
+      ) {
         return
       }
 
@@ -1124,26 +1474,33 @@ export default class {
       const order = value ? 'Charge' : 'Stop'
 
       // Log the update
-      accessory.log(`${platformLang.curCharging} [${value ? platformLang.returning : platformLang.stop}]`)
+      accessory.log(
+        `${platformLang.curCharging} [${value ? platformLang.returning : platformLang.stop}]`,
+      )
 
       // Send the command
       accessory.logDebug(`${platformLang.sendCmd} [${order}]`)
       accessory.control.run(order)
     } catch (err) {
       // Catch any errors during the process
-      accessory.logWarn(`${platformLang.chargeFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`)
+      accessory.logWarn(
+        `${platformLang.chargeFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`,
+      )
 
       // Throw a 'no response' error and set a timeout to revert this after 2 seconds
       setTimeout(() => {
         accessory
           .getService('Go Charge')
-          .updateCharacteristic(this.hapChar.On, accessory.context.cacheCharge === 'returning')
+          ?.updateCharacteristic(
+            this.hapChar.On,
+            accessory.context.cacheCharge === 'returning',
+          )
       }, 2000)
       throw new this.hapErr(-70402)
     }
   }
 
-  async internalAirDryingUpdate(accessory, value) {
+  async internalAirDryingUpdate(accessory: PlatformAccessory & AccessoryExtraProps, value: boolean) {
     try {
       // Don't continue if we can't send commands to the device
       if (!accessory.control) {
@@ -1164,19 +1521,25 @@ export default class {
       accessory.control.run(order)
     } catch (err) {
       // Catch any errors during the process
-      accessory.logWarn(`${platformLang.airDryingFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`)
+      accessory.logWarn(
+        `${platformLang.airDryingFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`,
+      )
 
       // Throw a 'no response' error and set a timeout to revert this after 2 seconds
       setTimeout(() => {
         accessory
           .getService('Air Drying')
-          .updateCharacteristic(this.hapChar.On, accessory.context.cacheAirDrying === 'airdrying')
+          ?.updateCharacteristic(
+            this.hapChar.On,
+            accessory.context.cacheAirDrying === 'airdrying',
+          )
       }, 2000)
+
       throw new this.hapErr(-70402)
     }
   }
 
-  async internalTrueDetectUpdate(accessory, value) {
+  async internalTrueDetectUpdate(accessory: PlatformAccessory & AccessoryExtraProps, value: boolean) {
     try {
       // Don't continue if we can't send commands to the device
       if (!accessory.control) {
@@ -1197,19 +1560,22 @@ export default class {
       accessory.control.run(command)
     } catch (err) {
       // Catch any errors during the process
-      accessory.logWarn(`${platformLang.cleanFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`)
+      accessory.logWarn(
+        `${platformLang.cleanFail} ${parseError(err, [platformLang.errNotInit, platformLang.errNotReady])}`,
+      )
 
       // Throw a 'no response' error and set a timeout to revert this after 2 seconds
       setTimeout(() => {
         accessory
           .getService('Clean')
-          .updateCharacteristic(this.cusChar.TrueDetect, false)
+          ?.updateCharacteristic(this.cusChar.TrueDetect, false)
       }, 2000)
+
       throw new this.hapErr(-70402)
     }
   }
 
-  externalReadyUpdate(accessory) {
+  externalReadyUpdate(accessory: PlatformAccessory & AccessoryExtraProps) {
     try {
       // Called on the 'ready' event sent by the device so request update for states
       accessory.logDebug(`${platformLang.sendCmd} [GetBatteryState]`)
@@ -1218,7 +1584,9 @@ export default class {
       accessory.logDebug(`${platformLang.sendCmd} [GetChargeState]`)
       accessory.control.run('GetChargeState')
 
-      accessory.logDebug(`${platformLang.sendCmd} [GetCleanState${accessory.context.commandSuffix}]`)
+      accessory.logDebug(
+        `${platformLang.sendCmd} [GetCleanState${accessory.context.commandSuffix}]`,
+      )
       accessory.control.run(`GetCleanState${accessory.context.commandSuffix}`)
 
       accessory.logDebug(`${platformLang.sendCmd} [GetCleanSpeed]`)
@@ -1235,7 +1603,7 @@ export default class {
     }
   }
 
-  externalCleanUpdate(accessory, newVal) {
+  externalCleanUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: string) {
     try {
       // Log the received update
       accessory.logDebug(`${platformLang.receiveCmd} [CleanReport: ${newVal}]`)
@@ -1245,11 +1613,19 @@ export default class {
         // State is different so update service
         accessory
           .getService('Clean')
-          .updateCharacteristic(
+          ?.updateCharacteristic(
             this.hapChar.On,
-            ['auto', 'clean', 'edge', 'spot', 'spotarea', 'customarea'].includes(
-              newVal.toLowerCase().replace(/[^a-z]+/g, ''),
-            ),
+            [
+              'auto',
+              'clean',
+              'edge',
+              'spot',
+              'spotarea',
+              'customarea',
+              'spotareav2',
+              'customareav2',
+              'mapping',
+            ].includes(newVal.toLowerCase().replace(/[^a-z0-9]+/g, '')),
           )
 
         // Log the change
@@ -1264,7 +1640,7 @@ export default class {
     }
   }
 
-  externalSpeedUpdate(accessory, newVal) {
+  externalSpeedUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: number) {
     try {
       // Log the received update
       accessory.logDebug(`${platformLang.receiveCmd} [CleanSpeed: ${newVal}]`)
@@ -1274,10 +1650,12 @@ export default class {
         // State is different so update service
         accessory
           .getService('Clean')
-          .updateCharacteristic(this.cusChar.MaxSpeed, [3, 4].includes(newVal))
+          ?.updateCharacteristic(this.cusChar.MaxSpeed, [3, 4].includes(newVal))
 
         // Log the change
-        accessory.log(`${platformLang.curSpeed} [${platformConsts.speed2Label[newVal]}]`)
+        accessory.log(
+          `${platformLang.curSpeed} [${platformConsts.speed2Label[newVal]}]`,
+        )
       }
 
       // Always update the cache with the new speed status
@@ -1288,17 +1666,19 @@ export default class {
     }
   }
 
-  externalAirDryingUpdate(accessory, newVal) {
+  externalAirDryingUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: string) {
     try {
       // Log the received update
-      accessory.logDebug(`${platformLang.receiveCmd} [AirDryingState: ${newVal}]`)
+      accessory.logDebug(
+        `${platformLang.receiveCmd} [AirDryingState: ${newVal}]`,
+      )
 
       // Check if the new drying state is different from the cached state
       if (accessory.context.cacheAirDrying !== newVal) {
         // State is different so update service
         accessory
           .getService('Air Drying')
-          .updateCharacteristic(this.hapChar.On, newVal === 'airdrying')
+          ?.updateCharacteristic(this.hapChar.On, newVal === 'airdrying')
 
         // Log the change
         accessory.log(`${platformLang.curAirDrying} [${newVal}]`)
@@ -1312,7 +1692,7 @@ export default class {
     }
   }
 
-  externalTrueDetectUpdate(accessory, newVal) {
+  externalTrueDetectUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: number) {
     try {
       // Log the received update
       accessory.logDebug(`${platformLang.receiveCmd} [TrueDetect: ${newVal}]`)
@@ -1322,10 +1702,12 @@ export default class {
         // State is different so update service
         accessory
           .getService('Clean')
-          .updateCharacteristic(this.cusChar.TrueDetect, newVal === 1)
+          ?.updateCharacteristic(this.cusChar.TrueDetect, newVal === 1)
 
         // Log the change
-        accessory.log(`${platformLang.curTrueDetect} [${newVal === 1 ? 'enabled' : 'disabled'}]`)
+        accessory.log(
+          `${platformLang.curTrueDetect} [${newVal === 1 ? 'enabled' : 'disabled'}]`,
+        )
       }
 
       // Always update the cache with the new charging status
@@ -1336,7 +1718,7 @@ export default class {
     }
   }
 
-  externalChargeUpdate(accessory, newVal) {
+  externalChargeUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: string) {
     try {
       // Log the received update
       accessory.logDebug(`${platformLang.receiveCmd} [ChargeState: ${newVal}]`)
@@ -1346,11 +1728,12 @@ export default class {
         // State is different so update service
         accessory
           .getService('Go Charge')
-          .updateCharacteristic(this.hapChar.On, newVal === 'returning')
+          ?.updateCharacteristic(this.hapChar.On, newVal === 'returning')
+
         const chargeState = newVal === 'charging' ? 1 : 0
         accessory
           .getService(this.hapServ.Battery)
-          .updateCharacteristic(this.hapChar.ChargingState, chargeState)
+          ?.updateCharacteristic(this.hapChar.ChargingState, chargeState)
 
         // Log the change
         accessory.log(`${platformLang.curCharging} [${newVal}]`)
@@ -1364,14 +1747,14 @@ export default class {
     }
   }
 
-  externalIPUpdate(accessory, newVal) {
+  externalIPUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: string) {
     try {
       // Log the received update
       accessory.logDebug(`${platformLang.receiveCmd} [NetInfoIP: ${newVal}]`)
 
       // Check if the new IP is different from the cached IP
       if (accessory.context.ipAddress !== newVal) {
-        // IP is different so update context info
+        // IP is different, so update context info
         accessory.context.ipAddress = newVal
 
         // Update the changes to the accessory to the platform
@@ -1383,7 +1766,7 @@ export default class {
     }
   }
 
-  externalMacUpdate(accessory, newVal) {
+  externalMacUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: string) {
     try {
       // Log the received update
       accessory.logDebug(`${platformLang.receiveCmd} [NetInfoMAC: ${newVal}]`)
@@ -1402,7 +1785,7 @@ export default class {
     }
   }
 
-  async externalBatteryUpdate(accessory, newVal) {
+  async externalBatteryUpdate(accessory: PlatformAccessory & AccessoryExtraProps, newVal: number) {
     try {
       // Mark the device as online if it was offline before
       accessory.context.hadResponse = true
@@ -1420,16 +1803,16 @@ export default class {
         const lowBattStatus = newVal <= threshold ? 1 : 0
         accessory
           .getService(this.hapServ.Battery)
-          .updateCharacteristic(this.hapChar.BatteryLevel, newVal)
+          ?.updateCharacteristic(this.hapChar.BatteryLevel, newVal)
         accessory
           .getService(this.hapServ.Battery)
-          .updateCharacteristic(this.hapChar.StatusLowBattery, lowBattStatus)
+          ?.updateCharacteristic(this.hapChar.StatusLowBattery, lowBattStatus)
 
         // Also update the 'battery' humidity service if it exists
         if (accessory.context.rawConfig.showBattHumidity) {
           accessory
             .getService('Battery Level')
-            .updateCharacteristic(this.hapChar.CurrentRelativeHumidity, newVal)
+            ?.updateCharacteristic(this.hapChar.CurrentRelativeHumidity, newVal)
         }
 
         // Log the change
@@ -1441,7 +1824,10 @@ export default class {
           && newVal <= accessory.context.rawConfig.lowBattThreshold
           && !accessory.cacheShownMotionLowBatt
         ) {
-          await this.externalMessageUpdate(accessory, `${platformLang.lowBattMsg + newVal}%`)
+          await this.externalMessageUpdate(
+            accessory,
+            `${platformLang.lowBattMsg + newVal}%`,
+          )
           accessory.cacheShownMotionLowBatt = true
         }
 
@@ -1483,14 +1869,18 @@ export default class {
 
       // Update the motion sensor to motion detected if it exists
       if (accessory.getService('Attention')) {
-        accessory.getService('Attention').updateCharacteristic(this.hapChar.MotionDetected, true)
+        accessory
+          .getService('Attention')
+          .updateCharacteristic(this.hapChar.MotionDetected, true)
       }
 
       // The motion sensor stays on for the time configured by the user, so we wait
       setTimeout(() => {
         // Reset the motion sensor after waiting for the time above if it exists
         if (accessory.getService('Attention')) {
-          accessory.getService('Attention').updateCharacteristic(this.hapChar.MotionDetected, false)
+          accessory
+            .getService('Attention')
+            .updateCharacteristic(this.hapChar.MotionDetected, false)
         }
 
         // Update the inUse cache to false as we are complete here
@@ -1534,18 +1924,26 @@ export default class {
 
       // Update the motion sensor to motion detected if it exists
       if (accessory.getService('Attention')) {
-        accessory.getService('Attention').updateCharacteristic(this.hapChar.MotionDetected, true)
+        accessory
+          .getService('Attention')
+          .updateCharacteristic(this.hapChar.MotionDetected, true)
       }
 
       // The device has an error so turn both 'clean' and 'charge' switches off
-      accessory.getService('Clean').updateCharacteristic(this.hapChar.On, false)
-      accessory.getService('Go Charge').updateCharacteristic(this.hapChar.On, false)
+      accessory
+        .getService('Clean')
+        .updateCharacteristic(this.hapChar.On, false)
+      accessory
+        .getService('Go Charge')
+        .updateCharacteristic(this.hapChar.On, false)
 
       // The motion sensor stays on for the time configured by the user, so we wait
       setTimeout(() => {
         // Reset the motion sensor after waiting for the time above if it exists
         if (accessory.getService('Attention')) {
-          accessory.getService('Attention').updateCharacteristic(this.hapChar.MotionDetected, false)
+          accessory
+            .getService('Attention')
+            .updateCharacteristic(this.hapChar.MotionDetected, false)
         }
 
         // Update the inUse cache to false as we are complete here

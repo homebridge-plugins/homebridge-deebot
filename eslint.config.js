@@ -38,7 +38,7 @@ export default antfu(
       'unicorn/no-useless-spread': 'error',
       'unused-imports/no-unused-vars': ['error', { caughtErrors: 'none' }],
     },
-    typescript: false,
+    typescript: true,
   },
   {
     files: ['**/*.md'],

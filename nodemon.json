@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "src"
+  ],
+  "ext": "ts",
+  "ignore": [],
+  "exec": "tsc && cp -r ./src/homebridge-ui ./dist/ && homebridge run -U ./test/hbConfig -D",
+  "signal": "SIGTERM",
+  "env": {
+    "NODE_OPTIONS": "--trace-warnings"
+  }
+}

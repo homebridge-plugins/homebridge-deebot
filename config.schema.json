@@ -4,7 +4,7 @@
   "singular": true,
   "strictValidation": true,
   "customUi": true,
-  "customUiPath": "./lib/homebridge-ui",
+  "customUiPath": "./dist/homebridge-ui",
   "headerDisplay": "<p align=\"center\"><img width=\"60%\" src=\"https://user-images.githubusercontent.com/43026681/101321841-f0eb5280-385d-11eb-8dd4-f57113f6e078.png\"></p><p align=\"center\">For help and support please visit our <a href=\"https://github.com/homebridge-plugins/homebridge-ecovacs/wiki\">GitHub Wiki</a>. We hope you find this plugin useful!</p>",
   "schema": {
     "type": "object",
@@ -123,15 +123,21 @@
               "oneOf": [
                 {
                   "title": "Presetting",
-                  "enum": ["presetting"]
+                  "enum": [
+                    "presetting"
+                  ]
                 },
                 {
                   "title": "Yes",
-                  "enum": ["yes"]
+                  "enum": [
+                    "yes"
+                  ]
                 },
                 {
                   "title": "No",
-                  "enum": ["no"]
+                  "enum": [
+                    "no"
+                  ]
                 }
               ],
               "condition": {
@@ -149,8 +155,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs1": {
@@ -185,8 +201,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs2": {
@@ -221,8 +247,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs3": {
@@ -257,8 +293,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs4": {
@@ -293,8 +339,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs5": {
@@ -329,8 +385,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs6": {
@@ -365,8 +431,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs7": {
@@ -401,8 +477,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs8": {
@@ -437,8 +523,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs9": {
@@ -473,8 +569,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs10": {
@@ -509,8 +615,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs11": {
@@ -545,8 +661,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs12": {
@@ -581,8 +707,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs13": {
@@ -617,8 +753,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs14": {
@@ -653,8 +799,18 @@
               "title": "Area Type",
               "type": "string",
               "oneOf": [
-                { "title": "Spot Area", "enum": ["spotArea"] },
-                { "title": "Custom Area", "enum": ["customArea"] }
+                {
+                  "title": "Spot Area",
+                  "enum": [
+                    "spotArea"
+                  ]
+                },
+                {
+                  "title": "Custom Area",
+                  "enum": [
+                    "customArea"
+                  ]
+                }
               ]
             },
             "spotAreaIDs15": {
@@ -694,7 +850,12 @@
     {
       "type": "fieldset",
       "title": "Required Settings",
-      "items": ["useYeedi", "countryCode", "username", "password"]
+      "items": [
+        "useYeedi",
+        "countryCode",
+        "username",
+        "password"
+      ]
     },
     {
       "type": "fieldset",

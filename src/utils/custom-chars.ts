@@ -1,5 +1,17 @@
-export default class {
-  constructor(api) {
+import type { API } from 'homebridge'
+
+export default class PlatformChars {
+  declare uuids: {
+    maxSpeed: string
+    predefinedArea: string
+    trueDetect: string
+  }
+
+  declare MaxSpeed: any
+  declare PredefinedArea: any
+  declare TrueDetect: any
+
+  constructor(api: API) {
     this.uuids = {
       maxSpeed: 'E963F001-079E-48FF-8F27-9C2605A29F52',
       predefinedArea: 'E963F002-079E-48FF-8F27-9C2605A29F52',
@@ -9,10 +21,13 @@ export default class {
 
     this.MaxSpeed = class extends api.hap.Characteristic {
       constructor() {
-        super('Max Speed', uuids.maxSpeed)
-        this.setProps({
+        super('Max Speed', uuids.maxSpeed, {
           format: api.hap.Formats.BOOL,
-          perms: [api.hap.Perms.PAIRED_READ, api.hap.Perms.PAIRED_WRITE, api.hap.Perms.NOTIFY],
+          perms: [
+            api.hap.Perms.PAIRED_READ,
+            api.hap.Perms.PAIRED_WRITE,
+            api.hap.Perms.NOTIFY,
+          ],
         })
         this.value = this.getDefaultValue()
       }
@@ -20,10 +35,13 @@ export default class {
 
     this.PredefinedArea = class extends api.hap.Characteristic {
       constructor() {
-        super('Predefined Area', uuids.predefinedArea)
-        this.setProps({
+        super('Predefined Area', uuids.predefinedArea, {
           format: api.hap.Formats.UINT8,
-          perms: [api.hap.Perms.PAIRED_READ, api.hap.Perms.PAIRED_WRITE, api.hap.Perms.NOTIFY],
+          perms: [
+            api.hap.Perms.PAIRED_READ,
+            api.hap.Perms.PAIRED_WRITE,
+            api.hap.Perms.NOTIFY,
+          ],
           minValue: 0,
           maxValue: 15,
           minStep: 1,
@@ -35,10 +53,13 @@ export default class {
 
     this.TrueDetect = class extends api.hap.Characteristic {
       constructor() {
-        super('TrueDetect', uuids.trueDetect)
-        this.setProps({
+        super('TrueDetect', uuids.trueDetect, {
           format: api.hap.Formats.BOOL,
-          perms: [api.hap.Perms.PAIRED_READ, api.hap.Perms.PAIRED_WRITE, api.hap.Perms.NOTIFY],
+          perms: [
+            api.hap.Perms.PAIRED_READ,
+            api.hap.Perms.PAIRED_WRITE,
+            api.hap.Perms.NOTIFY,
+          ],
         })
         this.value = this.getDefaultValue()
       }
