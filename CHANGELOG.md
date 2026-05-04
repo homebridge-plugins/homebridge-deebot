@@ -2,7 +2,7 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
-## v8.0.0 (Pending Release)
+## v8.0.0 (2026-05-04)
 
 Many thanks to @tainguyen2512 for working on the Matter and Typescript integrations 🎉
 
