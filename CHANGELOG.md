@@ -37,6 +37,7 @@ Many thanks to @tainguyen2512 for working on the Matter and Typescript integrati
 ### Commits
 
 - feat: add basic typescript/matter support
+- docs: add `CLAUDE.md` file to repo
 
 ## v7.4.0 (2026-04-05)
 
