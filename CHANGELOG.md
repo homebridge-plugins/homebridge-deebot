@@ -7,6 +7,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changed
 
 - fix: do not force-load the Matter API, which made the plugin take the Matter path and disable itself on non-Matter bridges (#298) (#300)
+- fix: retry the Ecovacs login on transient failures instead of disabling the plugin until a restart (#284)
 
 ## v8.0.0 (2026-05-04)
 

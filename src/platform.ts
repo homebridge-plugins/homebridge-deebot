@@ -459,25 +459,46 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         this.ecovacsAPI.getVersion(),
       )
 
-      // Attempt to log in to Ecovacs/Yeedi
-      try {
-        await this.ecovacsAPI.connect(
-          this.config.username,
-          EcoVacsAPI.md5(this.config.password),
-        )
-      } catch (err) {
-        // Check if password error and reattempt with base64 decoded version of password
-        if (err.message?.includes('1010')) {
-          this.config.password = Buffer.from(this.config.password, 'base64')
-            .toString('utf8')
-            .replace(/\r\n|\n|\r/g, '')
-            .trim()
+      // Attempt to log in to Ecovacs/Yeedi. Transient failures (e.g. a
+      // temporary "connect to it server" error, code 1300) are retried with a
+      // short backoff so a passing cloud blip doesn't disable the whole plugin
+      // until the next restart.
+      const maxLoginAttempts = 3
+      for (let attempt = 1; ; attempt += 1) {
+        try {
           await this.ecovacsAPI.connect(
             this.config.username,
             EcoVacsAPI.md5(this.config.password),
           )
-        } else {
-          throw err
+          break
+        } catch (err) {
+          // A 1010 error means the password needs base64 decoding; transform it
+          // and retry once (this is not a transient failure).
+          if (err.message?.includes('1010')) {
+            this.config.password = Buffer.from(this.config.password, 'base64')
+              .toString('utf8')
+              .replace(/\r\n|\n|\r/g, '')
+              .trim()
+            await this.ecovacsAPI.connect(
+              this.config.username,
+              EcoVacsAPI.md5(this.config.password),
+            )
+            break
+          }
+          // Out of attempts - let the outer handler disable the plugin.
+          if (attempt >= maxLoginAttempts) {
+            throw err
+          }
+          // Otherwise wait with a simple linear backoff and try again.
+          const delay = attempt * 15
+          this.log.warn(
+            'Ecovacs login attempt %s/%s failed, retrying in %ss: %s',
+            attempt,
+            maxLoginAttempts,
+            delay,
+            parseError(err),
+          )
+          await sleep(delay)
         }
       }
 
