@@ -11,6 +11,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - chore: update `actions/checkout` workflow action to v7
 - chore: remove stray `exit 1` from the deprecation workflow script
 - chore: dependency updates
+- docs: correct the minimum Homebridge version in the readme to v2.0
 
 ## v8.0.0 (2026-05-04)
 
