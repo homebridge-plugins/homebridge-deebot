@@ -427,9 +427,6 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
   async pluginSetup() {
     // Plugin has finished initializing so now onto setup
     try {
-      // Ensure the Matter API is fully loaded before any access to api.matter
-      await (this.api as any).loadMatterAPI?.()
-
       // Log that the plugin initialization has been successful
       this.log('%s.', platformLang.initialised)
 

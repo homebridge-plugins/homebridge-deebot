@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.0.1 (Pending Release)
+
+### Changed
+
+- fix: do not force-load the Matter API, which made the plugin take the Matter path and disable itself on non-Matter bridges (#298) (#300)
+
 ## v8.0.0 (2026-05-04)
 
 Many thanks to @tainguyen2512 for working on the Matter and Typescript integrations 🎉
