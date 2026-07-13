@@ -7,6 +7,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changed
 
 - chore: remove the looking-for-maintainers message
+- fix: give each vacuum its own client resource so multiple devices no longer mix up status updates (#81)
 
 ## v8.0.1 (2026-07-12)
 

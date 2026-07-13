@@ -9,6 +9,7 @@ import type {
 import type { EcovacsConfig } from './config.js'
 
 import { Buffer } from 'node:buffer'
+import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import process from 'node:process'
 
@@ -593,6 +594,16 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
     }
   }
 
+  deviceClientResource(did: string): string {
+    // Each vacuum needs its own client resource, otherwise every vacuum connects
+    // to Ecovacs with the same identity (XMPP JID or MQTT client id) and the
+    // server mixes up which device a status message belongs to (#81)
+    return createHash('md5')
+      .update(`${this.ecovacsAPI.resource}${did}`)
+      .digest('hex')
+      .substring(0, 8)
+  }
+
   initialiseDevice(device) {
     try {
       // Generate the Homebridge UUID from the device id
@@ -615,7 +626,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
         EcoVacsAPI.REALM,
-        this.ecovacsAPI.resource,
+        this.deviceClientResource(device.did),
         this.ecovacsAPI.user_access_token,
         device,
         countries[this.config.countryCode].continent,
@@ -1109,7 +1120,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
         EcoVacsAPI.REALM,
-        this.ecovacsAPI.resource,
+        this.deviceClientResource(device.did),
         this.ecovacsAPI.user_access_token,
         device,
         countries[this.config.countryCode].continent,
