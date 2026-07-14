@@ -73,6 +73,5 @@ export default {
   speedFail: 'sending speed update failed as',
   stop: 'stop',
   typeForArea: 'Type for predefined area',
-  welcome: 'I\'m looking for some lovely people to help maintain this plugin, please get in touch on GitHub or Discord if you\'d like to help out 😄',
   unknownCommandTypeForArea: 'Unknown command type for predefined area',
 }

@@ -22,8 +22,6 @@ Homebridge plugin to integrate Ecovacs Deebot or Yeedi devices into HomeKit
   - requires your Ecovacs or Yeedi credentials to function
   - uses a cloud-based connection (i.e. requires the internet)
 
-> I'm looking for some lovely people to help maintain this plugin, please get in touch on GitHub or Discord if you'd like to help out 😄
-
 ### Prerequisites
 
 - To use this plugin, you will need to already have:

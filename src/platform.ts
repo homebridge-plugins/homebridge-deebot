@@ -557,7 +557,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       }
 
       // Setup successful
-      this.log('%s. %s', platformLang.complete, platformLang.welcome)
+      this.log('%s.', platformLang.complete)
     } catch (err) {
       // Catch any errors during setup
       this.log.warn('***** %s. *****', platformLang.disabling)

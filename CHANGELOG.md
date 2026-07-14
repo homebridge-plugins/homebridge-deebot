@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.0.2 (Pending Release)
+
+### Changed
+
+- chore: remove the looking-for-maintainers message
+
 ## v8.0.1 (2026-07-12)
 
 ### Changed
