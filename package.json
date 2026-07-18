@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.2.5",
-    "ecovacs-deebot": "^0.9.6-beta.12",
+    "ecovacs-deebot": "^1.0.0-alpha.22",
     "patch-package": "^8.0.1"
   },
   "devDependencies": {
@@ -80,26 +80,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },
-  "overrides": {
-    "ecovacs-deebot": {
-      "@xmldom/xmldom": "^0.9.10",
-      "axios": "^1.18.1",
-      "canvas": {
-        ".": "^2.11.2",
-        "@mapbox/node-pre-gyp": {
-          "tar": "^7.5.20"
-        }
-      },
-      "simple-xmpp": {
-        "node-xmpp-client": {
-          ".": "^3.1.11",
-          "request": {
-            "form-data": "^2.5.6",
-            "qs": "^6.15.3"
-          }
-        }
-      }
-    },
-    "reconnect-core": "0.0.1"
+  "allowScripts": {
+    "fsevents@2.3.3": true
   }
 }
