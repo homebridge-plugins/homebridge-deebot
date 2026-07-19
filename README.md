@@ -1,5 +1,5 @@
 <p align="center">
-   <a href="https://github.com/homebridge-plugins/homebridge-ecovacs"><img alt="homebridge-ecovacs" src="https://user-images.githubusercontent.com/43026681/101321841-f0eb5280-385d-11eb-8dd4-f57113f6e078.png" width="600px"></a>
+   <a href="https://github.com/homebridge-plugins/homebridge-ecovacs"><img alt="homebridge-ecovacs" src="https://raw.githubusercontent.com/homebridge-plugins/homebridge-ecovacs/latest/branding/Homebridge_x_Ecovacs.png" width="600px"></a>
 </p>
 <span align="center">
 
