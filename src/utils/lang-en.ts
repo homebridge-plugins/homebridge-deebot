@@ -74,4 +74,8 @@ export default {
   stop: 'stop',
   typeForArea: 'Type for predefined area',
   unknownCommandTypeForArea: 'Unknown command type for predefined area',
+  verifyCodeInvalid: 'The configured verification code was invalid or expired, so Ecovacs has emailed a new code to your account address (check your spam folder; the code expires after 24 hours). Enter the new code into the plugin\'s "Verification Code" setting and restart Homebridge',
+  verifyCodeSent: 'Ecovacs requires this device to be verified, so a verification code has been emailed to your account address. Look for an email from "ECOVACS Robotics" (noreply@support.ecovacs.com) about a login on a new mobile device — that device is this plugin — and check your spam folder if it does not appear. The code expires after 24 hours. Enter it into the plugin\'s "Verification Code" setting and restart Homebridge',
+  verifyStableFail: 'Device verification completed, but the stable library login still fails with code 1013. Try setting the plugin\'s "Library Version" setting to the alpha option - and please open a support request on GitHub so this can be investigated',
+  verifySuccess: 'Device verification was successful. You can now remove the code from the plugin\'s "Verification Code" setting',
 }

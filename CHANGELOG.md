@@ -2,6 +2,14 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.1.0 (Pending Release)
+
+⚠️ If installing fails on npm v12 with an `EALLOWREMOTE` error, see [#302](https://github.com/homebridge-plugins/homebridge-ecovacs/issues/302) for a one-line workaround.
+
+### Changed
+
+- feat: add a library version setting and complete ecovacs device verification automatically (code 1013)
+
 ## v8.0.4 (2026-07-19)
 
 ### Changed

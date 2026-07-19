@@ -37,6 +37,27 @@
         "type": "string",
         "description": "Your password, can also be a base64 encoded version of your password."
       },
+      "library": {
+        "title": "Library Version",
+        "type": "string",
+        "default": "stable",
+        "description": "Which version of the ecovacs-deebot library the plugin uses. The stable version supports some older devices that the alpha has dropped; the alpha version supports some newer devices. Leave on stable unless a device of yours is missing.",
+        "oneOf": [
+          {
+            "title": "Stable (supports some older devices)",
+            "enum": ["stable"]
+          },
+          {
+            "title": "Alpha (supports some newer devices)",
+            "enum": ["alpha"]
+          }
+        ]
+      },
+      "verificationCode": {
+        "title": "Verification Code",
+        "type": "string",
+        "description": "Only needed when the plugin log asks for it: enter the verification code that Ecovacs emails to your account address, then restart Homebridge. The email comes from 'ECOVACS Robotics' (noreply@support.ecovacs.com), mentions a login on a new mobile device (that device is this plugin), and may land in your spam folder. Codes expire after 24 hours. <a href=\"https://github.com/homebridge-plugins/homebridge-ecovacs/wiki/Device-Verification\" target=\"_blank\">Read more →</a>"
+      },
       "disableDeviceLogging": {
         "type": "boolean",
         "title": "Disable Device Logging",
@@ -861,7 +882,7 @@
       "type": "fieldset",
       "title": "Optional Settings",
       "expandable": true,
-      "items": ["disableDeviceLogging"]
+      "items": ["library", "verificationCode", "disableDeviceLogging"]
     },
     {
       "key": "devices",

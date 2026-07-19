@@ -69,6 +69,7 @@
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.2.5",
     "ecovacs-deebot": "^0.9.6-beta.12",
+    "ecovacs-deebot-alpha": "npm:ecovacs-deebot@1.0.0-alpha.23",
     "patch-package": "^8.0.1"
   },
   "devDependencies": {
