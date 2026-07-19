@@ -37,22 +37,6 @@
         "type": "string",
         "description": "Your password, can also be a base64 encoded version of your password."
       },
-      "library": {
-        "title": "Library Version",
-        "type": "string",
-        "default": "stable",
-        "description": "Which version of the ecovacs-deebot library the plugin uses. The stable version supports some older devices that the alpha has dropped; the alpha version supports some newer devices. Leave on stable unless a device of yours is missing.",
-        "oneOf": [
-          {
-            "title": "Stable (supports some older devices)",
-            "enum": ["stable"]
-          },
-          {
-            "title": "Alpha (supports some newer devices)",
-            "enum": ["alpha"]
-          }
-        ]
-      },
       "verificationCode": {
         "title": "Verification Code",
         "type": "string",
@@ -882,7 +866,7 @@
       "type": "fieldset",
       "title": "Optional Settings",
       "expandable": true,
-      "items": ["library", "verificationCode", "disableDeviceLogging"]
+      "items": ["verificationCode", "disableDeviceLogging"]
     },
     {
       "key": "devices",

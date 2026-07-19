@@ -83,7 +83,6 @@ export interface EcovacsConfig extends PlatformConfig {
   countryCode: string
   username: string
   password: string
-  library?: 'stable' | 'alpha'
   verificationCode?: string
   disableDeviceLogging?: boolean
   devices?: DeviceConfig[]

@@ -5,7 +5,6 @@ export default {
     countryCode: '',
     username: '',
     password: '',
-    library: 'stable',
     verificationCode: '',
     disableDeviceLogging: false,
     devices: [],
@@ -92,7 +91,6 @@ export default {
     pollInterval: 30,
   },
   allowed: {
-    library: ['stable', 'alpha'],
     showAirDryingSwitch: ['presetting', 'yes', 'no'],
   },
   speed2Label: {

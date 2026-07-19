@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.1.1 (2026-07-19)
+
+### Changed
+
+- fix: retire the library version setting - the alpha library is now purely an internal detail of device verification
+
 ## v8.1.0 (2026-07-19)
 
 ⚠️ If installing fails on npm v12 with an `EALLOWREMOTE` error, see [#302](https://github.com/homebridge-plugins/homebridge-ecovacs/issues/302) for a one-line workaround.

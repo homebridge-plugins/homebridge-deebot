@@ -13,7 +13,7 @@ import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import process from 'node:process'
 
-import { countries } from 'ecovacs-deebot'
+import { countries, EcoVacsAPI } from 'ecovacs-deebot'
 
 import { EcovacsRoboticVacuumAccessory } from './devices/index.js'
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js'
@@ -403,15 +403,11 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
           }
           this.config[key] = val === 'false' ? false : !!val
           break
-        case 'library': {
-          const inSet = typeof val === 'string' && platformConsts.allowed[key].includes(val)
-          if (!inSet) {
-            logIgnore(key)
-          } else {
-            this.config.library = val
-          }
+        case 'library':
+          // Retired setting (v8.1.0 only): the plugin always runs the stable
+          // library now, borrowing the alpha internally for verification -
+          // accept silently so existing configs don't warn
           break
-        }
         case 'name':
         case 'platform':
           break
@@ -459,15 +455,6 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // Require any libraries that the accessory instances use
       this.cusChar = new platformChars(this.api)
 
-      // Load the version of the ecovacs-deebot library the user has chosen.
-      // Both versions are installed: the stable 0.x supports some older
-      // devices that the 1.x dropped, while the 1.x-alpha supports the
-      // device-verification login (code 1013) that some accounts now require.
-      this.deebotLib = this.config.library === 'alpha'
-        ? await import('ecovacs-deebot-alpha')
-        : await import('ecovacs-deebot')
-      const { EcoVacsAPI } = this.deebotLib
-
       // Connect to Ecovacs/Yeedi
       this.ecovacsAPI = new EcoVacsAPI(
         EcoVacsAPI.getDeviceId(
@@ -501,38 +488,15 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         } catch (err) {
           // Device verification (login code 1013): the account needs this
           // client verified via a code that Ecovacs emails to the account
-          // address. The emailed code stays valid across restarts, so we only
-          // request one when no code is configured - requesting again would
-          // invalidate a code the user is about to enter.
-          //
-          // On the alpha library the api instance handles it directly (and
-          // verifyDevice completes the login). On the stable library, which
-          // has no verification support, we borrow a throwaway alpha api
-          // instance just for the verification - it shares the same device id
-          // and account, so once verified the stable login succeeds too - and
-          // then retry the stable login in the same process.
-          const { DeviceVerificationRequired, InvalidVerificationCode } = this.deebotLib
-          if (DeviceVerificationRequired && err instanceof DeviceVerificationRequired) {
-            if (this.config.verificationCode) {
-              try {
-                await this.ecovacsAPI.verifyDevice(this.config.verificationCode)
-                this.log('%s.', platformLang.verifySuccess)
-                break
-              } catch (verifyErr) {
-                if (InvalidVerificationCode && verifyErr instanceof InvalidVerificationCode) {
-                  await this.ecovacsAPI.requestDeviceVerificationCode()
-                  throw new Error(platformLang.verifyCodeInvalid)
-                }
-                throw verifyErr
-              }
-            }
-            await this.ecovacsAPI.requestDeviceVerificationCode()
-            throw new Error(platformLang.verifyCodeSent)
-          }
+          // address. Only the alpha version of the library can talk to the
+          // verification endpoints, so a throwaway alpha api instance is
+          // borrowed just for that step - it shares the same device id and
+          // account, so once verified this stable login succeeds too - and
+          // the login is then retried in the same process.
           if (err.message?.includes('1013')) {
             if (verificationDone) {
-              // Verification succeeded but the stable login still gets 1013 -
-              // do not loop; surface it honestly
+              // Verification succeeded but the login still gets 1013 - do
+              // not loop; surface it honestly
               throw new Error(platformLang.verifyStableFail)
             }
             await this.verifyViaAlphaLibrary()
@@ -752,7 +716,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // Load the device control information from Ecovacs/Yeedi
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
-        this.deebotLib.EcoVacsAPI.REALM,
+        EcoVacsAPI.REALM,
         this.deviceClientResource(device),
         this.ecovacsAPI.user_access_token,
         device,
@@ -1246,7 +1210,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // Load the device control object from Ecovacs/Yeedi
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
-        this.deebotLib.EcoVacsAPI.REALM,
+        EcoVacsAPI.REALM,
         this.deviceClientResource(device),
         this.ecovacsAPI.user_access_token,
         device,
