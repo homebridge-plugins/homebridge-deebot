@@ -85,11 +85,17 @@ export class EcovacsRoboticVacuumAccessory extends BaseMatterAccessory {
     const escapedMfr = manufacturer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const model = rawModel.replace(new RegExp(escapedMfr, 'i'), '').trim() || rawModel
 
+    // Matter caps serial numbers at 32 characters and UUID-style DIDs are 36,
+    // so drop the dashes (leaving exactly 32 hex characters) rather than let
+    // the core truncate with a warning on every load. The accessory UUID
+    // still derives from the full DID so existing pairings are unaffected.
+    const matterSerial = serialNumber.replace(/-/g, '').substring(0, 32)
+
     super(api, log, {
       UUID: api.matter.uuid.generate(`ecovacs-${serialNumber}`),
       displayName: device.nick || device.did,
       deviceType: api.matter.deviceTypes.RoboticVacuumCleaner,
-      serialNumber,
+      serialNumber: matterSerial,
       manufacturer,
       model,
       firmwareRevision: device.fwVersion || '1.0.0',

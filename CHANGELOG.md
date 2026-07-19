@@ -9,6 +9,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changed
 
 - feat: add a library version setting and complete ecovacs device verification automatically (code 1013)
+- fix: keep the matter serial number within 32 characters for uuid-style device ids
 
 ## v8.0.4 (2026-07-19)
 
