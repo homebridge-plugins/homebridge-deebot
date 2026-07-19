@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.0.3 (Pending Release)
+
+### Changed
+
+- chore(deps): revert `ecovacs-deebot` package
+
 ## v8.0.2 (2026-07-18)
 
 ### Changed
