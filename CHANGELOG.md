@@ -8,6 +8,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 
 - fix: borrow the newer library's login session when ecovacs refuses the stable login (code 1013)
 - feat: remember the ecovacs login session across restarts so verification is a one-time step
+- fix: note the optional canvas module being unbuilt once at debug level instead of warning on every map event
 
 ## v8.1.1 (2026-07-19)
 

@@ -3,6 +3,7 @@ export default {
   accNotReady: 'cannot currently be controlled, see plugin startup logs for any error',
   addInfo: 'additional info',
   airDryingFail: 'sending air drying update failed as',
+  canvasMissing: 'The optional canvas module is not built on this system, so map images cannot be processed. This does not affect any HomeKit functionality',
   cfgDef: 'is not a valid number so using default of',
   cfgDup: 'will be ignored since another entry with this ID already exists',
   cfgIgn: 'is not configured correctly so ignoring',

@@ -2180,6 +2180,18 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         return
       }
 
+      // The optional canvas module only draws map images, which HomeKit
+      // never sees - it is commonly unbuilt on user systems (npm 12 blocks
+      // its build script), so note it once quietly rather than warn per
+      // map event
+      if (String(err).includes('canvas.node')) {
+        if (!accessory.context.canvasNoteShown) {
+          accessory.context.canvasNoteShown = true
+          accessory.logDebug(platformLang.canvasMissing)
+        }
+        return
+      }
+
       // Don't bother logging the same message as before
       if (accessory.context.lastMsg === err) {
         return

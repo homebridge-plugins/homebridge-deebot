@@ -22,6 +22,7 @@
 
 import type { API, Logger, MatterRequests } from 'homebridge'
 
+import platformLang from '../utils/lang-en.js'
 import { BaseMatterAccessory } from './BaseMatterAccessory.js'
 
 /** Ecovacs clean-state values that indicate the vacuum is actively cleaning. */
@@ -70,6 +71,8 @@ export class EcovacsRoboticVacuumAccessory extends BaseMatterAccessory {
   private readonly mapsById = new Map<number, string>()
   /** Accumulated area data: areaId → { mapId, name } */
   private readonly areasById = new Map<number, { mapId: number, name: string }>()
+  /** One-time note flag for the optional canvas module being unbuilt */
+  private canvasNoteShown = false
 
   constructor(api: API, log: Logger, device: EcovacsDeviceInfo) {
     const serialNumber = device.did
@@ -215,6 +218,17 @@ export class EcovacsRoboticVacuumAccessory extends BaseMatterAccessory {
     // ── Error / offline detection ──────────────────────────────────
     control.on('Error', (err: string) => {
       if (err === 'NoError: Robot is operational') {
+        return
+      }
+      // The optional canvas module only draws map images, which HomeKit
+      // never sees - it is commonly unbuilt on user systems (npm 12 blocks
+      // its build script), so note it once quietly rather than warn per
+      // map event
+      if (String(err).includes('canvas.node')) {
+        if (!this.canvasNoteShown) {
+          this.canvasNoteShown = true
+          this.logDebug(platformLang.canvasMissing)
+        }
         return
       }
       this.logWarn(`Device error: ${err}`)
