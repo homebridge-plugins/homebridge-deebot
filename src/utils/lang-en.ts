@@ -55,6 +55,7 @@ export default {
   invalidCCode: 'Invalid country code',
   invalidPassword: 'Invalid password',
   invalidUsername: 'Invalid username',
+  loginBorrowed: 'Logged in using the newer version of the ecovacs-deebot library, as Ecovacs no longer accepts logins from the stable version for this account. Devices continue to run on the stable version as normal',
   lowBattMsg: 'Device has low battery - ',
   missingCreds: 'credentials missing from config',
   noCommandForArea: 'returning no command for predefined area',
@@ -76,6 +77,6 @@ export default {
   unknownCommandTypeForArea: 'Unknown command type for predefined area',
   verifyCodeInvalid: 'The configured verification code was invalid or expired, so Ecovacs has emailed a new code to your account address (check your spam folder; the code expires after 24 hours). Enter the new code into the plugin\'s "Verification Code" setting and restart Homebridge',
   verifyCodeSent: 'Ecovacs requires this device to be verified, so a verification code has been emailed to your account address. Look for an email from "ECOVACS Robotics" (noreply@support.ecovacs.com) about a login on a new mobile device — that device is this plugin — and check your spam folder if it does not appear. The code expires after 24 hours. Enter it into the plugin\'s "Verification Code" setting and restart Homebridge',
-  verifyStableFail: 'Device verification completed, but the Ecovacs login still fails with code 1013. Please open a support request on GitHub so this can be investigated',
+  verifyStableFail: 'The Ecovacs login completed but did not provide a usable session. Please open a support request on GitHub so this can be investigated',
   verifySuccess: 'Device verification was successful. You can now remove the code from the plugin\'s "Verification Code" setting',
 }

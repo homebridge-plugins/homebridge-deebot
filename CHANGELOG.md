@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.1.2 (Pending Release)
+
+### Changed
+
+- fix: borrow the newer library's login session when ecovacs refuses the stable login (code 1013)
+
 ## v8.1.1 (2026-07-19)
 
 ### Changed

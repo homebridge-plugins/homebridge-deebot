@@ -477,7 +477,6 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // short backoff so a passing cloud blip doesn't disable the whole plugin
       // until the next restart.
       const maxLoginAttempts = 3
-      let verificationDone = false
       for (let attempt = 1; ; attempt += 1) {
         try {
           await this.ecovacsAPI.connect(
@@ -486,22 +485,17 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
           )
           break
         } catch (err) {
-          // Device verification (login code 1013): the account needs this
-          // client verified via a code that Ecovacs emails to the account
-          // address. Only the alpha version of the library can talk to the
-          // verification endpoints, so a throwaway alpha api instance is
-          // borrowed just for that step - it shares the same device id and
-          // account, so once verified this stable login succeeds too - and
-          // the login is then retried in the same process.
+          // Code 1013: Ecovacs refuses the stable library's login for this
+          // account - either it wants the device verified (a code emailed to
+          // the account address) or it is version-gating the old login
+          // client outright ('please update to the latest version'). Both
+          // are handled by logging in with a borrowed alpha api instance
+          // (the only library version the endpoints accept) and handing its
+          // session to this stable instance, which happily uses it for the
+          // device list and device connections.
           if (err.message?.includes('1013')) {
-            if (verificationDone) {
-              // Verification succeeded but the login still gets 1013 - do
-              // not loop; surface it honestly
-              throw new Error(platformLang.verifyStableFail)
-            }
-            await this.verifyViaAlphaLibrary()
-            verificationDone = true
-            continue
+            await this.loginViaAlphaLibrary()
+            break
           }
           // A 1010 error means the password needs base64 decoding; transform it
           // and retry once (this is not a transient failure).
@@ -630,14 +624,15 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
   }
 
   /**
-   * Complete Ecovacs device verification using a throwaway instance of the
-   * alpha library, which is the only library version with verification
-   * support. Verification is tied to the account and device id - both shared
-   * with the stable library - so once this succeeds, the stable login works
-   * too. Throws with user instructions when a code still needs to be emailed
-   * or entered.
+   * Log in with a throwaway instance of the alpha library - the only library
+   * version whose login Ecovacs still accepts for accounts that return code
+   * 1013 - completing the emailed device-verification step if the account
+   * asks for it, then hand the session (uid + access token) to the stable
+   * library instance. The token is a plain account token that the stable
+   * library's device-list and device-connection calls accept as-is. Throws
+   * with user instructions when a code still needs to be emailed or entered.
    */
-  async verifyViaAlphaLibrary(): Promise<void> {
+  async loginViaAlphaLibrary(): Promise<void> {
     // The alpha's bundled type definitions predate the verification api, so
     // treat the module loosely like the rest of the library usage
     const alphaLib: any = await import('ecovacs-deebot-alpha')
@@ -654,28 +649,31 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         this.config.username,
         alphaLib.EcoVacsAPI.md5(this.config.password),
       )
-      // The alpha login succeeded without asking for verification - nothing
-      // to do here; the retried stable login will show where things stand
     } catch (err) {
       if (!(err instanceof alphaLib.DeviceVerificationRequired)) {
         throw err
       }
-      if (this.config.verificationCode) {
-        try {
-          await verifier.verifyDevice(this.config.verificationCode)
-          this.log('%s.', platformLang.verifySuccess)
-          return
-        } catch (verifyErr) {
-          if (verifyErr instanceof alphaLib.InvalidVerificationCode) {
-            await verifier.requestDeviceVerificationCode()
-            throw new Error(platformLang.verifyCodeInvalid)
-          }
-          throw verifyErr
-        }
+      if (!this.config.verificationCode) {
+        await verifier.requestDeviceVerificationCode()
+        throw new Error(platformLang.verifyCodeSent)
       }
-      await verifier.requestDeviceVerificationCode()
-      throw new Error(platformLang.verifyCodeSent)
+      try {
+        await verifier.verifyDevice(this.config.verificationCode)
+        this.log('%s.', platformLang.verifySuccess)
+      } catch (verifyErr) {
+        if (verifyErr instanceof alphaLib.InvalidVerificationCode) {
+          await verifier.requestDeviceVerificationCode()
+          throw new Error(platformLang.verifyCodeInvalid)
+        }
+        throw verifyErr
+      }
     }
+    if (!verifier.uid || !verifier.user_access_token) {
+      throw new Error(platformLang.verifyStableFail)
+    }
+    this.ecovacsAPI.uid = verifier.uid
+    this.ecovacsAPI.user_access_token = verifier.user_access_token
+    this.log('%s.', platformLang.loginBorrowed)
   }
 
   deviceClientResource(device): string {
