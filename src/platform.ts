@@ -832,20 +832,15 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
   }
 
   deviceClientResource(device): string {
-    // Ecovacs' MQTT broker only authorises connections whose client resource
-    // matches the resource the access token was issued for at login - any
-    // other resource is refused with 'Not authorized' and device control is
-    // lost. So MQTT devices (company 'eco-ng') must use the login resource.
-    if (device.company === 'eco-ng') {
-      return this.ecovacsAPI.resource
-    }
-    // XMPP devices accept any resource, so each vacuum gets its own -
-    // otherwise every vacuum connects with the same identity (XMPP JID) and
-    // the server mixes up which device a status message belongs to (#81)
-    return createHash('md5')
-      .update(`${this.ecovacsAPI.resource}${device.did}`)
-      .digest('hex')
-      .substring(0, 8)
+    // Every device connection must use the LOGIN resource: Ecovacs binds
+    // authorisation to the resource the access token was issued for, on BOTH
+    // protocols. A per-device resource (tried for #81) is refused with 'Not
+    // authorized' on MQTT and 'XMPP authentication failure' on XMPP - proven
+    // in the field on v8.0.3 and v8.1.2 respectively. If #81's multi-vacuum
+    // status mix-up resurfaces, the real fix is a separate login (and
+    // therefore token) per vacuum, not a changed resource.
+    void device
+    return this.ecovacsAPI.resource
   }
 
   initialiseDevice(device) {

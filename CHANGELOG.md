@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.1.3 (2026-07-19)
+
+### Changed
+
+- fix: xmpp devices connect with the login client resource again, as ecovacs refuses any other resource on xmpp just as it does on mqtt
+
 ## v8.1.2 (2026-07-19)
 
 ### Changed
