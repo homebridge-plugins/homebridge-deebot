@@ -10,10 +10,13 @@ import type { EcovacsConfig } from './config.js'
 
 import { Buffer } from 'node:buffer'
 import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { join } from 'node:path'
 import process from 'node:process'
 
 import { countries, EcoVacsAPI } from 'ecovacs-deebot'
+import storage from 'node-persist'
 
 import { EcovacsRoboticVacuumAccessory } from './devices/index.js'
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js'
@@ -455,6 +458,24 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // Require any libraries that the accessory instances use
       this.cusChar = new platformChars(this.api)
 
+      // Set up the session cache storage (shared cache folder used by my
+      // other plugins) so a working login session can be reused across
+      // restarts instead of logging in freshly every time
+      try {
+        const cachePath = join(this.api.user.storagePath(), '/bwp91_cache')
+        if (!existsSync(cachePath)) {
+          mkdirSync(cachePath)
+        }
+        this.storageData = storage.create({
+          dir: cachePath,
+          forgiveParseErrors: true,
+        })
+        await this.storageData.init()
+        this.storageClientData = true
+      } catch (err) {
+        this.log.debugWarn('%s %s.', platformLang.storageSetupErr, parseError(err))
+      }
+
       // Connect to Ecovacs/Yeedi
       this.ecovacsAPI = new EcoVacsAPI(
         EcoVacsAPI.getDeviceId(
@@ -472,63 +493,29 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         this.ecovacsAPI.getVersion(),
       )
 
-      // Attempt to log in to Ecovacs/Yeedi. Transient failures (e.g. a
-      // temporary "connect to it server" error, code 1300) are retried with a
-      // short backoff so a passing cloud blip doesn't disable the whole plugin
-      // until the next restart.
-      const maxLoginAttempts = 3
-      for (let attempt = 1; ; attempt += 1) {
-        try {
-          await this.ecovacsAPI.connect(
-            this.config.username,
-            EcoVacsAPI.md5(this.config.password),
-          )
-          break
-        } catch (err) {
-          // Code 1013: Ecovacs refuses the stable library's login for this
-          // account - either it wants the device verified (a code emailed to
-          // the account address) or it is version-gating the old login
-          // client outright ('please update to the latest version'). Both
-          // are handled by logging in with a borrowed alpha api instance
-          // (the only library version the endpoints accept) and handing its
-          // session to this stable instance, which happily uses it for the
-          // device list and device connections.
-          if (err.message?.includes('1013')) {
-            await this.loginViaAlphaLibrary()
-            break
-          }
-          // A 1010 error means the password needs base64 decoding; transform it
-          // and retry once (this is not a transient failure).
-          if (err.message?.includes('1010')) {
-            this.config.password = Buffer.from(this.config.password, 'base64')
-              .toString('utf8')
-              .replace(/\r\n|\n|\r/g, '')
-              .trim()
-            await this.ecovacsAPI.connect(
-              this.config.username,
-              EcoVacsAPI.md5(this.config.password),
-            )
-            break
-          }
-          // Out of attempts - let the outer handler disable the plugin.
-          if (attempt >= maxLoginAttempts) {
-            throw err
-          }
-          // Otherwise wait with a simple linear backoff and try again.
-          const delay = attempt * 15
-          this.log.warn(
-            'Ecovacs login attempt %s/%s failed, retrying in %ss: %s',
-            attempt,
-            maxLoginAttempts,
-            delay,
-            parseError(err),
-          )
-          await sleep(delay)
-        }
+      // Reuse a saved login session when one is available and unexpired -
+      // fresh logins are what trigger Ecovacs' device-verification emails,
+      // so the fewer of those the better
+      let usedCachedSession = false
+      const cachedSession = await this.loadSessionCache()
+      if (cachedSession) {
+        this.ecovacsAPI.uid = cachedSession.uid
+        this.ecovacsAPI.user_access_token = cachedSession.token
+        usedCachedSession = true
+        this.log('%s.', platformLang.sessionCached)
+      } else {
+        await this.performLogin()
       }
 
-      // Get a device list from Ecovacs/Yeedi
-      const deviceList = await this.ecovacsAPI.devices()
+      // Get a device list from Ecovacs/Yeedi. If a cached session turns out
+      // to be stale (rejected by the api), fall back to one fresh login
+      let deviceList = await this.getDeviceListSafe()
+      if (!Array.isArray(deviceList) && usedCachedSession) {
+        this.log.warn('%s.', platformLang.sessionStale)
+        await this.clearSessionCache()
+        await this.performLogin()
+        deviceList = await this.getDeviceListSafe()
+      }
 
       // Check the request for device list was successful
       if (!Array.isArray(deviceList)) {
@@ -624,6 +611,148 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
   }
 
   /**
+   * Attempt to log in to Ecovacs/Yeedi. Transient failures (e.g. a temporary
+   * 'connect to it server' error, code 1300) are retried with a short backoff
+   * so a passing cloud blip doesn't disable the whole plugin until the next
+   * restart.
+   */
+  async performLogin(): Promise<void> {
+    const maxLoginAttempts = 3
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        await this.ecovacsAPI.connect(
+          this.config.username,
+          EcoVacsAPI.md5(this.config.password),
+        )
+        return
+      } catch (err) {
+        // Code 1013: Ecovacs refuses the stable library's login for this
+        // account - either it wants the device verified (a code emailed to
+        // the account address) or it is version-gating the old login client
+        // outright ('please update to the latest version'). Both are handled
+        // by logging in with a borrowed alpha api instance (the only library
+        // version the endpoints accept) and handing its session to this
+        // stable instance, which happily uses it for the device list and
+        // device connections.
+        if (err.message?.includes('1013')) {
+          await this.loginViaAlphaLibrary()
+          return
+        }
+        // A 1010 error means the password needs base64 decoding; transform it
+        // and retry once (this is not a transient failure).
+        if (err.message?.includes('1010')) {
+          this.config.password = Buffer.from(this.config.password, 'base64')
+            .toString('utf8')
+            .replace(/\r\n|\n|\r/g, '')
+            .trim()
+          await this.ecovacsAPI.connect(
+            this.config.username,
+            EcoVacsAPI.md5(this.config.password),
+          )
+          return
+        }
+        // Out of attempts - let the outer handler disable the plugin.
+        if (attempt >= maxLoginAttempts) {
+          throw err
+        }
+        // Otherwise wait with a simple linear backoff and try again.
+        const delay = attempt * 15
+        this.log.warn(
+          'Ecovacs login attempt %s/%s failed, retrying in %ss: %s',
+          attempt,
+          maxLoginAttempts,
+          delay,
+          parseError(err),
+        )
+        await sleep(delay)
+      }
+    }
+  }
+
+  /**
+   * Fetch the device list, returning undefined instead of throwing so the
+   * caller can decide whether a stale cached session was to blame.
+   */
+  async getDeviceListSafe(): Promise<any[] | undefined> {
+    try {
+      const deviceList = await this.ecovacsAPI.devices()
+      return Array.isArray(deviceList) ? deviceList : undefined
+    } catch (err) {
+      this.log.debugWarn('%s %s.', platformLang.deviceListFail, parseError(err))
+      return undefined
+    }
+  }
+
+  /**
+   * The saved session is keyed to the account details, so a change of
+   * username, country or Yeedi mode invalidates it naturally.
+   */
+  sessionAccountKey(): string {
+    return createHash('md5')
+      .update(`${this.config.username}|${this.config.countryCode}|${this.config.useYeedi ? 'yeedi' : 'ecovacs'}`)
+      .digest('hex')
+  }
+
+  async loadSessionCache(): Promise<{ uid: string, token: string } | undefined> {
+    if (!this.storageClientData) {
+      return undefined
+    }
+    try {
+      const saved = await this.storageData.getItem('ecovacs_session')
+      if (
+        !saved
+        || saved.account !== this.sessionAccountKey()
+        || !saved.uid
+        || !saved.token
+        // Treat sessions within an hour of expiry (or with no known expiry)
+        // as expired so a device connection never starts on a dying token
+        || !saved.expiresAt
+        || saved.expiresAt < Date.now() + 60 * 60 * 1000
+      ) {
+        return undefined
+      }
+      return saved
+    } catch (err) {
+      this.log.debugWarn('%s %s.', platformLang.storageSetupErr, parseError(err))
+      return undefined
+    }
+  }
+
+  async saveSessionCache(uid: string, token: string, expiresAt: number | undefined, usedCode: string | undefined): Promise<void> {
+    if (!this.storageClientData) {
+      return
+    }
+    try {
+      await this.storageData.setItem('ecovacs_session', {
+        account: this.sessionAccountKey(),
+        uid,
+        token,
+        expiresAt,
+        usedCode,
+      })
+    } catch (err) {
+      this.log.debugWarn('%s %s.', platformLang.storageSetupErr, parseError(err))
+    }
+  }
+
+  async clearSessionCache(): Promise<void> {
+    if (!this.storageClientData) {
+      return
+    }
+    try {
+      const saved = await this.storageData.getItem('ecovacs_session')
+      // Keep the record of the last used code so a stale code left in the
+      // config is still recognised as spent
+      await this.storageData.setItem('ecovacs_session', {
+        account: this.sessionAccountKey(),
+        usedCode: saved?.account === this.sessionAccountKey() ? saved?.usedCode : undefined,
+      })
+    } catch (err) {
+      this.log.debugWarn('%s %s.', platformLang.storageSetupErr, parseError(err))
+    }
+  }
+
+  /**
    * Log in with a throwaway instance of the alpha library - the only library
    * version whose login Ecovacs still accepts for accounts that return code
    * 1013 - completing the emailed device-verification step if the account
@@ -644,6 +773,21 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       countries[this.config.countryCode].continent,
       this.config.useYeedi ? 'yeedi.com' : 'ecovacs.com',
     )
+    // A code from the config that was already spent on a previous successful
+    // verification must not be submitted again - Ecovacs codes are one-time,
+    // so resubmitting burns a request just to learn it is invalid
+    let spentCode: string | undefined
+    if (this.storageClientData) {
+      try {
+        const saved = await this.storageData.getItem('ecovacs_session')
+        if (saved?.account === this.sessionAccountKey()) {
+          spentCode = saved.usedCode
+        }
+      } catch {
+        // Treat as no spent code on any storage error
+      }
+    }
+    let codeUsed: string | undefined
     try {
       await verifier.connect(
         this.config.username,
@@ -653,12 +797,13 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       if (!(err instanceof alphaLib.DeviceVerificationRequired)) {
         throw err
       }
-      if (!this.config.verificationCode) {
+      if (!this.config.verificationCode || this.config.verificationCode === spentCode) {
         await verifier.requestDeviceVerificationCode()
         throw new Error(platformLang.verifyCodeSent)
       }
       try {
         await verifier.verifyDevice(this.config.verificationCode)
+        codeUsed = this.config.verificationCode
         this.log('%s.', platformLang.verifySuccess)
       } catch (verifyErr) {
         if (verifyErr instanceof alphaLib.InvalidVerificationCode) {
@@ -674,6 +819,16 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
     this.ecovacsAPI.uid = verifier.uid
     this.ecovacsAPI.user_access_token = verifier.user_access_token
     this.log('%s.', platformLang.loginBorrowed)
+
+    // Save the session so future restarts skip the login (and with it any
+    // repeat of the verification dance) until the token nears expiry
+    const credentials = verifier.getCredentials?.() ?? {}
+    await this.saveSessionCache(
+      verifier.uid,
+      verifier.user_access_token,
+      credentials.expiresAt ?? undefined,
+      codeUsed ?? spentCode,
+    )
   }
 
   deviceClientResource(device): string {
