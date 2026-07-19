@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.1.4 (2026-07-19)
+
+### Changed
+
+- fix(deps): override the vendored xmpp client's outdated ws dependency to close a dos advisory
+
 ## v8.1.3 (2026-07-19)
 
 ### Changed
