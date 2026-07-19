@@ -594,12 +594,19 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  deviceClientResource(did: string): string {
-    // Each vacuum needs its own client resource, otherwise every vacuum connects
-    // to Ecovacs with the same identity (XMPP JID or MQTT client id) and the
-    // server mixes up which device a status message belongs to (#81)
+  deviceClientResource(device): string {
+    // Ecovacs' MQTT broker only authorises connections whose client resource
+    // matches the resource the access token was issued for at login - any
+    // other resource is refused with 'Not authorized' and device control is
+    // lost. So MQTT devices (company 'eco-ng') must use the login resource.
+    if (device.company === 'eco-ng') {
+      return this.ecovacsAPI.resource
+    }
+    // XMPP devices accept any resource, so each vacuum gets its own -
+    // otherwise every vacuum connects with the same identity (XMPP JID) and
+    // the server mixes up which device a status message belongs to (#81)
     return createHash('md5')
-      .update(`${this.ecovacsAPI.resource}${did}`)
+      .update(`${this.ecovacsAPI.resource}${device.did}`)
       .digest('hex')
       .substring(0, 8)
   }
@@ -626,7 +633,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
         EcoVacsAPI.REALM,
-        this.deviceClientResource(device.did),
+        this.deviceClientResource(device),
         this.ecovacsAPI.user_access_token,
         device,
         countries[this.config.countryCode].continent,
@@ -1120,7 +1127,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       const loadedDevice = this.ecovacsAPI.getVacBot(
         this.ecovacsAPI.uid,
         EcoVacsAPI.REALM,
-        this.deviceClientResource(device.did),
+        this.deviceClientResource(device),
         this.ecovacsAPI.user_access_token,
         device,
         countries[this.config.countryCode].continent,

@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.0.4 (2026-07-19)
+
+### Changed
+
+- fix: mqtt devices connect with the login client resource again, as a custom one is refused with 'not authorized' and control is lost
+
 ## v8.0.3 (2026-07-19)
 
 ### Changed
