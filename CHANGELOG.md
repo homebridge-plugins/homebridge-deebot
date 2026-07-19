@@ -2,7 +2,7 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
-## v8.1.0 (Pending Release)
+## v8.1.0 (2026-07-19)
 
 ⚠️ If installing fails on npm v12 with an `EALLOWREMOTE` error, see [#302](https://github.com/homebridge-plugins/homebridge-ecovacs/issues/302) for a one-line workaround.
 
