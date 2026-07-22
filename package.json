@@ -39,6 +39,7 @@
   "keywords": [
     "homebridge",
     "homebridge-plugin",
+    "supports-matter",
     "homebridge-deebot",
     "homebridge-ecovacs",
     "hoobs",
