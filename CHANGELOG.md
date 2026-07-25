@@ -7,6 +7,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changed
 
 - feat(ui): add, remove and hide devices from the config via the my devices tab
+- style(ui): standardise the custom ui layout and sync the support tab with the readme
 
 ## v8.1.4 (2026-07-19)
 
