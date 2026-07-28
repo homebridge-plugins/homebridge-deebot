@@ -7,6 +7,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changed
 
 - chore: add a changelog:sync script to populate the pending section from the commits
+- chore: count a repeated commit subject once when syncing the changelog
 
 ## v8.2.1 (2026-07-28)
 
