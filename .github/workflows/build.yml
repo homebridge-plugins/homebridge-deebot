@@ -22,3 +22,7 @@ jobs:
     uses: homebridge/.github/.github/workflows/nodejs-build-and-test.yml@latest
     with:
       install_cmd: npm install
+      # Fails the build when the changelog's top section does not list every
+      # unreleased commit, in order. Without it the mismatch only shows up at
+      # release time. `npm run changelog:sync` fixes one up locally.
+      check_changelog: true
