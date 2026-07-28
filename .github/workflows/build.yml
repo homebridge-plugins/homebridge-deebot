@@ -8,9 +8,17 @@ permissions:
 jobs:
   lint:
     uses: homebridge/.github/.github/workflows/eslint.yml@latest
+    with:
+      # npm 10 (the npm shipped with Node 22) cannot produce a lock file that
+      # satisfies its own `npm ci` for this dependency tree - the nested
+      # `overrides` for canvas/node-pre-gyp/tar and simple-xmpp/request defeat
+      # it, and a freshly generated lock file is rejected immediately. npm 12
+      # handles it correctly. Until those overrides can be simplified, install
+      # with `npm install` so the Node 22 job is not permanently red.
+      install_cmd: npm install
 
   # Runs `npm run build --if-present` and `npm run test`, on Node 22, 24 and 26.
-  # The `--if-present` is what keeps this usable for the JavaScript plugins,
-  # which have no build script - they run the tests only.
   build-and-test:
     uses: homebridge/.github/.github/workflows/nodejs-build-and-test.yml@latest
+    with:
+      install_cmd: npm install
