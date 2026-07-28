@@ -2,14 +2,14 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
-## v8.2.1 (Pending Release)
+## v8.2.1 (2026-07-28)
 
 ### Changed
 
 - fix: quieten the ecovacs library logging from within the plugin, instead of editing node_modules during install
 - chore: add a test setup, and keep test files out of the published package
-- chore: declare support for node 26
 - chore(github): run the build and tests in ci, on node 22, 24 and 26
+- chore(github): install with npm install in ci, as npm 10 cannot satisfy this lock file
 - chore: use the same lint setup across every plugin
 
 ## v8.2.0 (2026-07-27)
