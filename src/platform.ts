@@ -24,6 +24,7 @@ import platformConsts from './utils/constants.js'
 import platformChars from './utils/custom-chars.js'
 import { parseError, sleep } from './utils/functions.js'
 import platformLang from './utils/lang-en.js'
+import { quietEcovacsEventLogging } from './utils/quiet-library-logging.js'
 
 const require = createRequire(import.meta.url)
 const plugin = require('../package.json')
@@ -63,6 +64,12 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
     // Begin plugin initialization
     try {
       this.isBeta = process.argv.includes('-D')
+
+      // Stop the ecovacs-deebot library printing every MQTT payload it receives
+      // to the console. Must happen before any connection is created.
+      if (!quietEcovacsEventLogging()) {
+        this.log.debug('Could not quieten the ecovacs-deebot event logging - the library may have changed its logger, so expect extra output in the log.')
+      }
 
       // Configuration objects for accessories
       this.deviceConf = {}

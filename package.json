@@ -65,15 +65,13 @@
     "watch": "npm run build && npm link && nodemon",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "npm run lint -- --fix",
-    "prepublishOnly": "npm run lint && npm run build",
-    "postinstall": "patch-package"
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.2.5",
     "ecovacs-deebot": "^0.9.6-beta.12",
     "ecovacs-deebot-alpha": "npm:ecovacs-deebot@1.0.0-alpha.23",
-    "node-persist": "^4.0.4",
-    "patch-package": "^8.0.1"
+    "node-persist": "^4.0.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.2.0",

@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.2.1 (Pending Release)
+
+### Changed
+
+- fix: quieten the ecovacs library logging from within the plugin, instead of editing node_modules during install
+
 ## v8.2.0 (2026-07-27)
 
 ### Changed
