@@ -65,7 +65,10 @@
     "watch": "npm run build && npm link && nodemon",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "npm run lint -- --fix",
-    "prepublishOnly": "npm run lint && npm run build"
+    "prepublishOnly": "npm run lint && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test-coverage": "npm run test -- --coverage"
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.2.5",
@@ -76,11 +79,13 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.2.0",
     "@types/node": "^26.1.1",
+    "@vitest/coverage-v8": "^4.1.10",
     "homebridge": "^2.2.1",
     "nodemon": "^3.1.14",
     "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
   },
   "overrides": {
     "ecovacs-deebot": {

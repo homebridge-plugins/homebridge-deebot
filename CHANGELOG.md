@@ -7,6 +7,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 ### Changed
 
 - fix: quieten the ecovacs library logging from within the plugin, instead of editing node_modules during install
+- chore: add a test setup, and keep test files out of the published package
 
 ## v8.2.0 (2026-07-27)
 

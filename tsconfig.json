@@ -16,5 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["eslint.config.js", "src"]
+  "include": ["eslint.config.js", "src"],
+  "exclude": ["**/*.test.ts", "**/*.spec.ts"]
 }
