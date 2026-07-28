@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.2.2 (Pending Release)
+
+### Changed
+
+- chore: add a changelog:sync script to populate the pending section from the commits
+
 ## v8.2.1 (2026-07-28)
 
 ### Changed
