@@ -112,7 +112,7 @@
     "reconnect-core": "0.0.1"
   },
   "allowScripts": {
-    "canvas@2.11.2": true,
-    "fsevents@2.3.3": true
+    "canvas": true,
+    "fsevents": true
   }
 }
