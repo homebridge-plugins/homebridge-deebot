@@ -136,3 +136,13 @@ web_modules/
 
 test/
 .idea
+
+# tests
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+/test
+/__tests__
+vitest.config.js
+vitest.config.ts

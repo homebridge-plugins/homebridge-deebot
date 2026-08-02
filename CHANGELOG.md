@@ -13,6 +13,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - chore: allow dependency install scripts by package name rather than pinned version, so a version bump cannot silently block a native build
 - fix(deps): refresh brace-expansion to a patched version, clearing the high npm advisory
 - fix(deps): force axios to a patched version under both deebot libraries, clearing eleven npm advisories
+- chore: exclude test files and the test config from the published package
 
 ## v8.2.1 (2026-07-28)
 
