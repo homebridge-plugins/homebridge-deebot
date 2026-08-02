@@ -12,6 +12,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - docs: add node 26 to the supported node versions
 - chore: allow dependency install scripts by package name rather than pinned version, so a version bump cannot silently block a native build
 - fix(deps): refresh brace-expansion to a patched version, clearing the high npm advisory
+- fix(deps): force axios to a patched version under both deebot libraries, clearing eleven npm advisories
 
 ## v8.2.1 (2026-07-28)
 

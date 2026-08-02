@@ -91,7 +91,7 @@
   "overrides": {
     "ecovacs-deebot": {
       "@xmldom/xmldom": "^0.9.10",
-      "axios": "^1.18.1",
+      "axios": "^1.19.0",
       "canvas": {
         ".": "^2.11.2",
         "@mapbox/node-pre-gyp": {
@@ -108,6 +108,9 @@
           "ws": "^8.21.1"
         }
       }
+    },
+    "ecovacs-deebot-alpha": {
+      "axios": "^1.19.0"
     },
     "reconnect-core": "0.0.1"
   },
