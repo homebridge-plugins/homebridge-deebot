@@ -73,6 +73,8 @@ export default {
   sentMsg: 'sent message',
   skippingValue: 'skipping old value as new value noticed',
   sessionCached: 'Reusing the saved Ecovacs login session from a previous start',
+  sessionRenewed: 'The Ecovacs login session has been renewed before its expiry',
+  sessionRenewFail: 'Could not renew the Ecovacs login session in the background, the current session continues:',
   sessionStale: 'The saved Ecovacs login session was not accepted, logging in freshly',
   speedFail: 'sending speed update failed as',
   stop: 'stop',

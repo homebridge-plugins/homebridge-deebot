@@ -510,18 +510,33 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         this.ecovacsAPI.user_access_token = cachedSession.token
         usedCachedSession = true
         this.log('%s.', platformLang.sessionCached)
+        this.scheduleSessionRefresh(cachedSession.expiresAt)
       } else {
         await this.performLogin()
       }
 
-      // Get a device list from Ecovacs/Yeedi. If a cached session turns out
-      // to be stale (rejected by the api), fall back to one fresh login
-      let deviceList = await this.getDeviceListSafe()
+      // Get a device list from Ecovacs/Yeedi. When reusing a saved session the
+      // list is retried before concluding anything about the session: a cloud
+      // blip or a network still coming up at boot looks identical to a stale
+      // token here, and giving the session up over one costs the owner a fresh
+      // login and with it, on some accounts, an emailed verification code. A
+      // genuinely dead session just fails all three quick attempts (#306)
+      let deviceList = await this.getDeviceListSafe(usedCachedSession ? 3 : 1)
       if (!Array.isArray(deviceList) && usedCachedSession) {
         this.log.warn('%s.', platformLang.sessionStale)
-        await this.clearSessionCache()
+        // The saved session is left in place, not cleared: if this fresh login
+        // fails too (network down, cloud outage) the next restart should try
+        // the saved session again rather than jump straight to a verification
+        // code. A successful login below overwrites or clears it instead
+        this.sessionSavedByLogin = false
         await this.performLogin()
-        deviceList = await this.getDeviceListSafe()
+        deviceList = await this.getDeviceListSafe(2)
+        if (Array.isArray(deviceList) && !this.sessionSavedByLogin) {
+          // The fresh login worked but came via the stable path, which has no
+          // session to save - drop the rejected session so the next restart
+          // does not retry a known-dead token
+          await this.clearSessionCache()
+        }
       }
 
       // Check the request for device list was successful
@@ -601,6 +616,12 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         clearInterval(this.refreshIntervals[id])
       })
 
+      // Stop any pending session renewal
+      if (this.sessionRefreshTimer) {
+        clearTimeout(this.sessionRefreshTimer)
+        this.sessionRefreshTimer = undefined
+      }
+
       // Disconnect from each Ecovacs/Yeedi HAP device
       devicesInHB.forEach((accessory) => {
         if (accessory.control?.is_ready) {
@@ -678,16 +699,27 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
 
   /**
    * Fetch the device list, returning undefined instead of throwing so the
-   * caller can decide whether a stale cached session was to blame.
+   * caller can decide whether a stale cached session was to blame. Attempts
+   * beyond the first wait a short moment first, so a passing cloud blip or a
+   * network that is still coming up at boot gets a second chance before the
+   * caller concludes the session itself is dead.
    */
-  async getDeviceListSafe(): Promise<any[] | undefined> {
-    try {
-      const deviceList = await this.ecovacsAPI.devices()
-      return Array.isArray(deviceList) ? deviceList : undefined
-    } catch (err) {
-      this.log.debugWarn('%s %s.', platformLang.deviceListFail, parseError(err))
-      return undefined
+  async getDeviceListSafe(attempts = 1): Promise<any[] | undefined> {
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      if (attempt > 1) {
+        await sleep(attempt * 5)
+      }
+      try {
+        const deviceList = await this.ecovacsAPI.devices()
+        if (Array.isArray(deviceList)) {
+          return deviceList
+        }
+        this.log.debugWarn('%s (attempt %s/%s).', platformLang.deviceListFail, attempt, attempts)
+      } catch (err) {
+        this.log.debugWarn('%s (attempt %s/%s) %s.', platformLang.deviceListFail, attempt, attempts, parseError(err))
+      }
     }
+    return undefined
   }
 
   /**
@@ -700,7 +732,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       .digest('hex')
   }
 
-  async loadSessionCache(): Promise<{ uid: string, token: string } | undefined> {
+  async loadSessionCache(): Promise<{ uid: string, token: string, expiresAt: number } | undefined> {
     if (!this.storageClientData) {
       return undefined
     }
@@ -726,6 +758,7 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
   }
 
   async saveSessionCache(uid: string, token: string, expiresAt: number | undefined, usedCode: string | undefined): Promise<void> {
+    this.sessionSavedByLogin = true
     if (!this.storageClientData) {
       return
     }
@@ -737,8 +770,86 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         expiresAt,
         usedCode,
       })
+      this.scheduleSessionRefresh(expiresAt)
     } catch (err) {
       this.log.debugWarn('%s %s.', platformLang.storageSetupErr, parseError(err))
+    }
+  }
+
+  /**
+   * Renew the login session shortly before its token expires, quietly.
+   *
+   * The token Ecovacs issues lasts about seven days, and before this existed
+   * that was the whole story: the saved session aged out, and the next restart
+   * had to log in freshly - which on many accounts means an emailed
+   * verification code and a manual restart. Owners saw that as "the plugin
+   * randomly signs me out every few days" (#306), which is exactly what it was.
+   *
+   * So while Homebridge is running, the session is re-earned in the background
+   * a day before it would die, and the renewed one is saved. As long as
+   * Homebridge is restarted at least once a week, no session should ever be
+   * old enough to need a code again.
+   *
+   * Quietly means exactly that: if Ecovacs demands a verification code for the
+   * renewal, this gives up and says nothing to the cloud - requesting a code
+   * emails the owner, and a background timer has no business doing that. The
+   * current session keeps working, and nothing is lost by having asked.
+   */
+  scheduleSessionRefresh(expiresAt: number | undefined): void {
+    if (this.sessionRefreshTimer) {
+      clearTimeout(this.sessionRefreshTimer)
+      this.sessionRefreshTimer = undefined
+    }
+    if (!expiresAt) {
+      return
+    }
+    // A day before expiry, but never sooner than an hour from now, so a
+    // session loaded already-near-expiry does not refresh in a tight loop
+    const delay = Math.max(expiresAt - Date.now() - 24 * 60 * 60 * 1000, 60 * 60 * 1000)
+    this.sessionRefreshTimer = setTimeout(() => this.quietSessionRefresh(), delay)
+    // A pending refresh must not hold the process open on shutdown
+    this.sessionRefreshTimer.unref?.()
+  }
+
+  async quietSessionRefresh(): Promise<void> {
+    try {
+      const alphaLib: any = await import('ecovacs-deebot-alpha')
+      const verifier = new alphaLib.EcoVacsAPI(
+        alphaLib.EcoVacsAPI.getDeviceId(
+          this.api.hap.uuid.generate(this.config.username),
+        ),
+        this.config.countryCode,
+        countries[this.config.countryCode].continent,
+        this.config.useYeedi ? 'yeedi.com' : 'ecovacs.com',
+      )
+      await verifier.connect(
+        this.config.username,
+        alphaLib.EcoVacsAPI.md5(this.config.password),
+      )
+      if (!verifier.uid || !verifier.user_access_token) {
+        throw new Error(platformLang.verifyStableFail)
+      }
+      // Adopt the renewed session for anything created from here on, and save
+      // it so the next restart starts from a fresh session, not a dying one.
+      // Device connections already running keep their own established sessions
+      this.ecovacsAPI.uid = verifier.uid
+      this.ecovacsAPI.user_access_token = verifier.user_access_token
+      const credentials = verifier.getCredentials?.() ?? {}
+      await this.saveSessionCache(
+        verifier.uid,
+        verifier.user_access_token,
+        credentials.expiresAt ?? undefined,
+        undefined,
+      )
+      this.log('%s.', platformLang.sessionRenewed)
+    } catch (err) {
+      // Renewal is best-effort - the current session is untouched and keeps
+      // working until its own expiry, so failing here costs nothing. Try again
+      // in twelve hours; even an attempt after expiry is worth making, since a
+      // success then still spares the next restart the verification dance
+      this.log.debug('%s %s.', platformLang.sessionRenewFail, parseError(err))
+      this.sessionRefreshTimer = setTimeout(() => this.quietSessionRefresh(), 12 * 60 * 60 * 1000)
+      this.sessionRefreshTimer.unref?.()
     }
   }
 

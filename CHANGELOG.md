@@ -14,6 +14,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix(deps): refresh brace-expansion to a patched version, clearing the high npm advisory
 - fix(deps): force axios to a patched version under both deebot libraries, clearing eleven npm advisories
 - chore: exclude test files and the test config from the published package
+- fix: keep the ecovacs session through cloud blips and renew it before its weekly expiry (#306)
 
 ## v8.2.1 (2026-07-28)
 
