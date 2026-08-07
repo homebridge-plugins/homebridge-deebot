@@ -63,8 +63,6 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
 
     // Begin plugin initialization
     try {
-      this.isBeta = process.argv.includes('-D')
-
       // Stop the ecovacs-deebot library printing every MQTT payload it receives
       // to the console. Must happen before any connection is created.
       if (!quietEcovacsEventLogging()) {
@@ -453,14 +451,16 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // Log that the plugin initialization has been successful
       this.log('%s.', platformLang.initialised)
 
-      // Sort out some logging functions
-      if (this.isBeta) {
-        this.log.debug = this.log
-        this.log.debugWarn = this.log.warn
-      } else {
-        this.log.debug = () => {}
-        this.log.debugWarn = () => {}
-      }
+      // Homebridge already decides whether debug lines are shown, and it gets it
+      // right in a child bridge too. This used to work it out for itself by
+      // looking for `-D` in the plugin's own process arguments, which a child
+      // bridge does not receive unless that bridge has its own debug setting
+      // turned on - so debug logging silently disappeared for anyone running the
+      // plugin in a child bridge with debug enabled globally.
+      //
+      // `debugWarn` has no equivalent on Homebridge's logger, so it goes out as
+      // a debug line too rather than being invented here.
+      this.log.debugWarn = (...args: any[]) => this.log.debug(args[0], ...args.slice(1))
 
       // Require any libraries that the accessory instances use
       this.cusChar = new platformChars(this.api)
@@ -1000,28 +1000,22 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
 
       accessory.context.rawConfig = this.deviceConf?.[device.did] || platformConsts.defaultDevice
 
-      // Sort out some logging functions per accessory
-      if (this.isBeta) {
+      // Debug lines always go to Homebridge's debug logger, which prints them
+      // only when debug is on - so there is nothing to decide here. Working it
+      // out from the process arguments instead is what lost debug logging
+      // entirely for anyone running the plugin in a child bridge.
+      accessory.logDebug = msg =>
+        this.log.debug('[%s] %s.', accessory.displayName, msg)
+      accessory.logDebugWarn = accessory.logDebug
+
+      if (this.config.disableDeviceLogging) {
+        accessory.log = () => {}
+        accessory.logWarn = () => {}
+      } else {
         accessory.log = msg =>
           this.log('[%s] %s.', accessory.displayName, msg)
         accessory.logWarn = msg =>
           this.log.warn('[%s] %s.', accessory.displayName, msg)
-        accessory.logDebug = msg =>
-          this.log('[%s] %s.', accessory.displayName, msg)
-        accessory.logDebugWarn = msg =>
-          this.log.warn('[%s] %s.', accessory.displayName, msg)
-      } else {
-        if (this.config.disableDeviceLogging) {
-          accessory.log = () => {}
-          accessory.logWarn = () => {}
-        } else {
-          accessory.log = msg =>
-            this.log('[%s] %s.', accessory.displayName, msg)
-          accessory.logWarn = msg =>
-            this.log.warn('[%s] %s.', accessory.displayName, msg)
-        }
-        accessory.logDebug = () => {}
-        accessory.logDebugWarn = () => {}
       }
 
       // Initially set the device online value to false (to be updated later)

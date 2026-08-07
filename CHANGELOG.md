@@ -15,6 +15,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix(deps): force axios to a patched version under both deebot libraries, clearing eleven npm advisories
 - chore: exclude test files and the test config from the published package
 - fix: keep the ecovacs session through cloud blips and renew it before its weekly expiry (#306)
+- fix: restore debug logging when the plugin runs in a child bridge
 
 ## v8.2.1 (2026-07-28)
 
