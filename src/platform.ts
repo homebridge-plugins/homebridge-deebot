@@ -1204,9 +1204,15 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
           .onSet(async value =>
             this.internalTrueDetectUpdate(accessory, value),
           )
-      } else if (accessory.getService('TrueDetect')) {
-        // Remove TrueDetect service if exists
-        accessory.removeService(accessory.getService('TrueDetect'))
+      } else if (cleanService.testCharacteristic(this.cusChar.TrueDetect)) {
+        // TrueDetect is a characteristic on the Clean switch, not a service of its
+        // own, so looking for a service named 'TrueDetect' never found anything.
+        // The toggle stayed in Eve after the setting was turned off, restored from
+        // the accessory cache, with no handler behind it - so it did nothing and
+        // never reflected the robot. This mirrors how PredefinedArea is removed.
+        cleanService.removeCharacteristic(
+          cleanService.getCharacteristic(this.cusChar.TrueDetect),
+        )
       }
 
       // Save the device control information to the accessory
