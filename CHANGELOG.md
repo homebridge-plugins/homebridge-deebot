@@ -19,6 +19,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: make the poll interval refresh the device, instead of restarting the bridge every tick
 - fix: remove the true detect toggle from eve when the setting is turned off
 - fix: put the go charge switch back when the vacuum is already charging
+- fix: stop repeating the same device error on every command in matter mode
 
 ## v8.2.1 (2026-07-28)
 

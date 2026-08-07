@@ -74,6 +74,10 @@ export class EcovacsRoboticVacuumAccessory extends BaseMatterAccessory {
   /** One-time note flag for the optional canvas module being unbuilt */
   private canvasNoteShown = false
 
+  // The last device error reported, so a robot that is simply switched off does
+  // not warn on every command the plugin sends. The HAP path already does this
+  private lastReportedError = ''
+
   constructor(api: API, log: Logger, device: EcovacsDeviceInfo) {
     const serialNumber = device.did
     const isV2 = device.isV2 ?? false
@@ -231,9 +235,12 @@ export class EcovacsRoboticVacuumAccessory extends BaseMatterAccessory {
         }
         return
       }
-      this.logWarn(`Device error: ${err}`)
-      if (err === 'Recipient unavailable') {
-        this.logWarn('Device appears to be offline.')
+      if (this.lastReportedError !== String(err)) {
+        this.lastReportedError = String(err)
+        this.logWarn(`Device error: ${err}`)
+        if (err === 'Recipient unavailable') {
+          this.logWarn('Device appears to be offline.')
+        }
       }
       void this.updateOperationalState(3) // Error
     })
