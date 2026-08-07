@@ -1352,11 +1352,17 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       const { pollInterval } = accessory.context.rawConfig || platformConsts.defaultValues
 
       if (pollInterval > 0) {
+        // This used to call `control.refresh()`, which the ecovacs-deebot VacBot
+        // class does not have - so every tick threw inside the timer, where
+        // nothing could catch it, and Homebridge restarted the bridge. The method
+        // that actually asks the robot for its state is refreshAccessory(), which
+        // was otherwise only ever called once at startup, so polling did nothing
+        // even when it was not crashing the bridge.
         this.refreshIntervals[device.did] = setInterval(() => {
-          devicesInHB
-            .get(this.api.hap.uuid.generate(device.did))
-            .control
-            ?.refresh()
+          const polled = devicesInHB.get(this.api.hap.uuid.generate(device.did))
+          if (polled?.control) {
+            this.refreshAccessory(polled)
+          }
         }, pollInterval * 1000)
       }
 

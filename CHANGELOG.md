@@ -16,6 +16,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - chore: exclude test files and the test config from the published package
 - fix: keep the ecovacs session through cloud blips and renew it before its weekly expiry (#306)
 - fix: restore debug logging when the plugin runs in a child bridge
+- fix: make the poll interval refresh the device, instead of restarting the bridge every tick
 
 ## v8.2.1 (2026-07-28)
 
