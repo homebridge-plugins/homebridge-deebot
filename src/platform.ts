@@ -1854,11 +1854,22 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       // A one-second delay seems to make everything more responsive
       await sleep(1)
 
-      // Don't continue if the device is already charging
+      // Don't continue if the device is already charging. Put the switch back
+      // first: without this it stayed on whatever the owner had just set, and
+      // nothing corrected it afterwards, because the external update only pushes
+      // a change when the reported charge state changes - and it does not.
       const battService = accessory.getService(this.hapServ.Battery)
       if (
         battService?.getCharacteristic(this.hapChar.ChargingState).value !== 0
       ) {
+        setTimeout(() => {
+          accessory
+            .getService('Go Charge')
+            ?.updateCharacteristic(
+              this.hapChar.On,
+              accessory.context.cacheCharge === 'returning',
+            )
+        }, 2000)
         return
       }
 
