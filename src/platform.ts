@@ -1282,10 +1282,12 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         })
       }
 
-      // Set up a listener for the device 'message' event
-      accessory.control.on('message', async (msg) => {
-        await this.externalMessageUpdate(accessory, msg)
-      })
+      // There was a listener for a 'message' event here. The library never emits
+      // one, so it did nothing. The nearest real event, 'messageReceived', fires
+      // for every routine mqtt frame the robot sends, so wiring it up would keep
+      // the Attention sensor permanently triggered. The alerts worth surfacing
+      // arrive on 'Error' and through the low battery path, both of which are
+      // already handled.
 
       // Set up a listener for the device 'Error' event
       accessory.control.on('Error', async (err) => {
