@@ -10,6 +10,7 @@ export default {
   cfgIgnItem: 'has an invalid entry which will be ignored',
   cfgItem: 'Config entry',
   cfgLow: 'is set too low so increasing to',
+  cfgHigh: 'is set too high so reducing to',
   cfgRmv: 'is unused and can be removed',
   cfgQts: 'should not have quotes around its entry',
   chargeFail: 'sending charge update failed as',

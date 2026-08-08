@@ -90,6 +90,14 @@ export default {
     motionDuration: 1,
     pollInterval: 30,
   },
+  // A Node timer holds its delay in a signed 32-bit integer. Over 2147483647 ms
+  // it does not throw - it quietly becomes 1 ms, so a setting past this point
+  // would poll Ecovacs a thousand times a second rather than once in a while.
+  // 2073600 seconds is 24 days, comfortably inside the limit once multiplied up.
+  maxValues: {
+    motionDuration: 2073600,
+    pollInterval: 2073600,
+  },
   allowed: {
     showAirDryingSwitch: ['presetting', 'yes', 'no'],
   },

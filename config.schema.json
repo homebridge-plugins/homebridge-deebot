@@ -74,6 +74,7 @@
               "title": "Polling Interval",
               "type": "integer",
               "placeholder": 120,
+              "maximum": 2073600,
               "description": "An interval (in seconds) in which this device will refresh with Ecovacs. Set to 0 to disable, otherwise must be 30 or more."
             },
             "hideMotionSensor": {
@@ -89,6 +90,7 @@
               "type": "integer",
               "placeholder": 30,
               "minimum": 1,
+              "maximum": 2073600,
               "description": "The length of time (in seconds) that the motion detector will be activated if your Deebot sends a message, needs help or has low battery (if enabled below). The message is viewable in the log. Must be 1 or more.",
               "condition": {
                 "functionBody": "return (model?.devices?.[arrayIndices]?.deviceId?.length > 0 && !model?.devices?.[arrayIndices]?.hideMotionSensor && !model?.devices?.[arrayIndices]?.ignoreDevice);"

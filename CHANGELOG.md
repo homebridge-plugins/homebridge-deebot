@@ -21,6 +21,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: put the go charge switch back when the vacuum is already charging
 - fix: stop repeating the same device error on every command in matter mode
 - fix: remove a listener for a device event that is never sent
+- fix: reject a poll interval so large it would make the plugin poll every millisecond
 
 ## v8.2.1 (2026-07-28)
 

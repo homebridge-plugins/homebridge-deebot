@@ -172,6 +172,15 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         min,
       )
     }
+    const logDecrease = (k: string, max: number) => {
+      this.log.warn(
+        '%s [%s] %s %s.',
+        platformLang.cfgItem,
+        k,
+        platformLang.cfgHigh,
+        max,
+      )
+    }
     const logQuotes = (k: string) => {
       this.log.warn(
         '%s [%s] %s.',
@@ -328,6 +337,12 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
                         platformConsts.minValues[k],
                       )
                       this.deviceConf[id][k] = platformConsts.minValues[k]
+                    } else if (platformConsts.maxValues[k] !== undefined && intVal > platformConsts.maxValues[k]) {
+                      logDecrease(
+                        `${key}.${id}.${k}`,
+                        platformConsts.maxValues[k],
+                      )
+                      this.deviceConf[id][k] = platformConsts.maxValues[k]
                     } else {
                       this.deviceConf[id][k] = intVal
                     }
@@ -349,6 +364,9 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
                     } else if (intVal < platformConsts.minValues[k]) {
                       logIncrease(key, platformConsts.minValues[k])
                       this.deviceConf[id][k] = platformConsts.minValues[k]
+                    } else if (intVal > platformConsts.maxValues[k]) {
+                      logDecrease(key, platformConsts.maxValues[k])
+                      this.deviceConf[id][k] = platformConsts.maxValues[k]
                     } else {
                       this.deviceConf[id][k] = intVal
                     }
@@ -805,7 +823,13 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
     }
     // A day before expiry, but never sooner than an hour from now, so a
     // session loaded already-near-expiry does not refresh in a tight loop
-    const delay = Math.max(expiresAt - Date.now() - 24 * 60 * 60 * 1000, 60 * 60 * 1000)
+    // Also capped at what a Node timer can hold, because past 2147483647 ms a
+    // timer quietly becomes 1 ms - so an expiry far enough in the future would
+    // refresh the session in a tight loop, the very thing the lower bound guards
+    const delay = Math.min(
+      Math.max(expiresAt - Date.now() - 24 * 60 * 60 * 1000, 60 * 60 * 1000),
+      2147483647,
+    )
     this.sessionRefreshTimer = setTimeout(() => this.quietSessionRefresh(), delay)
     // A pending refresh must not hold the process open on shutdown
     this.sessionRefreshTimer.unref?.()
