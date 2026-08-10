@@ -22,6 +22,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 - fix: stop repeating the same device error on every command in matter mode
 - fix: remove a listener for a device event that is never sent
 - fix: reject a poll interval so large it would make the plugin poll every millisecond
+- chore(deps): dependency updates
 
 ## v8.2.1 (2026-07-28)
 
