@@ -8,6 +8,7 @@ All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be document
 
 - fix: refresh a matter vacuum on a timer, so a missed docking event stops leaving it on updating
 - fix: say when a device id in the config matches nothing, instead of ignoring its settings in silence
+- chore(deps): dependency updates
 
 ## v8.2.2 (2026-08-09)
 
