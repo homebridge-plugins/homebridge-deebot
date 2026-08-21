@@ -22,7 +22,7 @@ import { EcovacsRoboticVacuumAccessory } from './devices/index.js'
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js'
 import platformConsts from './utils/constants.js'
 import platformChars from './utils/custom-chars.js'
-import { parseError, sleep } from './utils/functions.js'
+import { matterPollInterval, parseError, sleep } from './utils/functions.js'
 import platformLang from './utils/lang-en.js'
 import { quietEcovacsEventLogging } from './utils/quiet-library-logging.js'
 
@@ -1533,11 +1533,11 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       loadedDevice.connect()
       matterVacuum.connectControl(loadedDevice)
 
-      // Optional polling
+      // State refresh. Unlike the HAP accessories this is on by default - see
+      // matterPollInterval for why a Matter vacuum cannot rely on push alone.
       const deviceConf
         = this.deviceConf?.[device.did] || platformConsts.defaultDevice
-      const pollInterval
-        = deviceConf.pollInterval ?? platformConsts.defaultValues.pollInterval
+      const pollInterval = matterPollInterval(deviceConf.pollInterval)
       if (pollInterval > 0) {
         this.refreshIntervals[device.did] = setInterval(() => {
           loadedDevice.run?.('GetBatteryState')

@@ -2,6 +2,12 @@
 
 All notable changes to `@homebridge-plugins/homebridge-ecovacs` will be documented in this file.
 
+## v8.2.3 (Pending Release)
+
+### Changed
+
+- fix: refresh a matter vacuum on a timer, so a missed docking event stops leaving it on updating
+
 ## v8.2.2 (2026-08-09)
 
 ### Changed

@@ -75,7 +75,7 @@
               "type": "integer",
               "placeholder": 120,
               "maximum": 2073600,
-              "description": "An interval (in seconds) in which this device will refresh with Ecovacs. Set to 0 to disable, otherwise must be 30 or more."
+              "description": "An interval (in seconds) in which this device will refresh with Ecovacs. Set to 0 to disable, otherwise must be 30 or more. Matter vacuums refresh every 120 seconds unless you set a value here; the other accessory types do not refresh unless you set one."
             },
             "hideMotionSensor": {
               "title": "Hide Motion Sensor",
