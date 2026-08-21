@@ -572,6 +572,11 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
         deviceList.length,
         platformLang.deviceCount(this.config.useYeedi ? 'Yeedi' : 'Ecovacs'),
       )
+      // A device id in the config that matches nothing on the account is
+      // silently ignored, so a wrong or stale one looks exactly like the
+      // setting not working (#309). Say so, and name the ids that do exist.
+      this.warnAboutUnmatchedDeviceConfig(deviceList)
+
       for (let i = 0; i < deviceList.length; i += 1) {
         this.initialiseDevice(deviceList[i])
       }
@@ -983,6 +988,32 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
     // therefore token) per vacuum, not a changed resource.
     void device
     return this.ecovacsAPI.resource
+  }
+
+  /**
+   * Warn about any `devices` entry whose id matches no device on the account.
+   *
+   * Every per-device setting is looked up by `did`, so an id that matches
+   * nothing means all of that entry's settings are quietly ignored - with no
+   * log line to say why.
+   */
+  warnAboutUnmatchedDeviceConfig(deviceList) {
+    const configured = Object.keys(this.deviceConf || {})
+    if (configured.length === 0) {
+      return
+    }
+    const known = new Set((deviceList || []).map(device => device.did))
+    const unmatched = configured.filter(id => !known.has(id))
+    if (unmatched.length === 0) {
+      return
+    }
+    this.log.warn(
+      '%s [%s]. %s [%s].',
+      platformLang.devConfNoMatch,
+      unmatched.join(', '),
+      platformLang.devConfIdsAre,
+      [...known].join(', '),
+    )
   }
 
   initialiseDevice(device) {
@@ -1538,6 +1569,14 @@ export class EcovacsPlatform implements DynamicPlatformPlugin {
       const deviceConf
         = this.deviceConf?.[device.did] || platformConsts.defaultDevice
       const pollInterval = matterPollInterval(deviceConf.pollInterval)
+      // The HAP path prints the settings it resolved for a device; this one did
+      // not, so "my pollInterval is being ignored" had nothing to check (#309)
+      this.log(
+        '[%s] [Matter] %s: %s.',
+        dName,
+        platformLang.devInitOpts,
+        JSON.stringify({ ...deviceConf, pollInterval }),
+      )
       if (pollInterval > 0) {
         this.refreshIntervals[device.did] = setInterval(() => {
           loadedDevice.run?.('GetBatteryState')

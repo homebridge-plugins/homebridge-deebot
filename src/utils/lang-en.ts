@@ -31,6 +31,8 @@ export default {
   deviceCount: acc => `device(s) found in your ${acc} account`,
   deviceListFail: 'could not retrieve devices from the cloud',
   devInit: 'initialised with id',
+  devConfIdsAre: 'The device ids on your account are',
+  devConfNoMatch: 'These device ids in your config match nothing on your account, so their settings are being ignored:',
   devInitOpts: 'initialising with options',
   devNotAdd: 'could not be added to Homebridge as',
   devNotConf: 'could not be configured as',
